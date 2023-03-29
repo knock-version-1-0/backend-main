@@ -1,17 +1,17 @@
 build:
-	docker build -t knock-server .
+	docker build -t backend-webapp .
 
 runserver:
-	docker run -p 8000:8000 --name knock-server knock-server
+	docker run -p 8000:8000 --name webapp backend-webapp
 
 clean:
-	docker stop knock-server
-	docker rm knock-server
-	docker rmi knock-server
+	docker stop webapp
+	docker rm webapp
+	docker rmi backend-webapp
 
 rebuild:
-	docker stop knock-server
-	docker rm knock-server
-	docker rmi knock-server
-	docker build -t knock-server .
-	docker run -p 8000:8000 --name knock-server knock-server
+	docker stop webapp
+	docker rm webapp
+	docker rmi backend-webapp
+	docker build -t backend-webapp .
+	docker run -p 8000:8000 --name webapp backend-webapp

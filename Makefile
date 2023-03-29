@@ -1,11 +1,14 @@
-up dev:
-	docker-compose -f docker-compose-dev.yaml up -d
+up-dev:
+	docker-compose -f docker-compose.dev.yaml up -d
 
 up-prod:
-	docker-compose -f docker-compose-prod.yaml up -d
+	docker-compose -f docker-compose.prod.yaml up -d
 
 down-dev:
-	docker-compose -f docker-compose-dev.yaml down --remove-orphans
+	docker-compose -f docker-compose.dev.yaml down --remove-orphans
+
+down-prod:
+	docker-compose -f docker-compose.prod.yaml down --remove-orphans
 
 clean:
 	docker stop webapp postgres nginx

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-if [[ -f .env ]]; then
-  export $(cat .env | grep -v '^# ' | xargs)
-fi
+python manage.py migrate
 
-python manage.py runserver 0.0.0.0:8000
+gunicorn --bind 0.0.0.0:8000 knock.wsgi

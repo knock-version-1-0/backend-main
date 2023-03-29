@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the Django app with Gunicorn
-CMD ["./entrypoint.sh"]
+CMD ["./run.sh"]
