@@ -1,17 +1,17 @@
 build:
-	docker build -t backend-webapp .
+	docker build -t api/main .
 
 runserver:
-	docker run -p 8000:8000 --name webapp backend-webapp
+	docker run -p 8000:8000 --name api_main api/main
 
 clean:
-	docker stop webapp
-	docker rm webapp
-	docker rmi backend-webapp
+	docker stop api_main
+	docker rm api_main
+	docker rmi api/main
 
 rebuild:
-	docker stop webapp
-	docker rm webapp
-	docker rmi backend-webapp
-	docker build -t backend-webapp .
-	docker run -p 8000:8000 --name webapp backend-webapp
+	docker stop api_main
+	docker rm api_main
+	docker rmi api/main
+	docker build -t api/main .
+	docker run -p 8000:8000 --name webapp api/main

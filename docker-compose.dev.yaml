@@ -1,8 +1,9 @@
 version: '3'
 
 services:
-  webapp:
-    container_name: webapp
+  api_main:
+    image: api/main
+    container_name: api_main
     env_file:
       - ./src/.env
     build: ./src
@@ -30,4 +31,4 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - webapp
+      - api_main
