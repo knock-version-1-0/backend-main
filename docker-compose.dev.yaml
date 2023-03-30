@@ -7,9 +7,12 @@ services:
     env_file:
       - ./src/.env
     build: ./src
-    command: ./entrypoint.sh
     volumes:
-      - .:/code
+      - ./scripts/entrypoint.sh:/app/entrypoint.sh
+      - ./scripts/wait-for-it.sh:/app/wait-for-it.sh
+    command: |
+      sh -c "./wait-for-it.sh db:5432 --
+            ./entrypoint.sh"
     ports:
       - "8000:8000"
     depends_on:
