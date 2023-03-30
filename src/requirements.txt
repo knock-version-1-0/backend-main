@@ -3,3 +3,4 @@ gunicorn
 django-cors-headers
 djangorestframework==3.13.1
 psycopg2-binary
+pytest-django==4.5.2

@@ -4,6 +4,12 @@ build:
 runserver:
 	docker run -p 8000:8000 --name api_main api/main
 
+runserver-d:
+	docker run -d -p 8000:8000 --name api_main api/main
+
+shell:
+	docker exec -it api_main bash
+
 clean:
 	docker stop api_main
 	docker rm api_main
