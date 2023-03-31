@@ -17,6 +17,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:14.2
@@ -25,6 +26,12 @@ services:
       - ./src/.env
     ports:
       - "5432:5432"
+  
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
 
   nginx:
     image: nginx:latest
@@ -33,5 +40,6 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./src/.static-files:/src/static-files
     depends_on:
       - api_main
