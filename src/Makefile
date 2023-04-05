@@ -5,15 +5,20 @@ runserver:
 	docker run -p 8000:8000 --name api_main --network backend-main_default api/main
 
 runserver-d:
-	docker run -d -p 8000:8000 --name api_main api/main
+	docker run -d -p 8000:8000 --name api_main --network backend-main_default api/main
 
 shell:
 	docker exec -it api_main bash
 
-clean:
+down:
 	docker stop api_main
 	docker rm api_main
 	docker rmi api/main
+
+clean:
+	docker stop api_main redis postgres
+	docker rm api_main redis postgres
+	docker rmi api/main redis postgres:14.2
 
 restart:
 	docker stop api_main

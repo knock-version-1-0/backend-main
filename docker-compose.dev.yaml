@@ -26,6 +26,9 @@ services:
       - ./src/.env
     ports:
       - "5432:5432"
+    volumes:
+      - ./scripts/db-init.sh:/scripts/db-init.sh
+      - ./db/sql:/sql
   
   redis:
     image: redis:latest
