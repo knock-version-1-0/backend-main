@@ -16,14 +16,14 @@ from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'knock.settings.prod')
 
-import notes.routing
+from apps.notes import routing as note_routing
 
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
         "websocket": AllowedHostsOriginValidator(
             AuthMiddlewareStack(URLRouter(
-                notes.routing.websocket_urlpatterns
+                note_routing.websocket_urlpatterns
             ))
         )
     }

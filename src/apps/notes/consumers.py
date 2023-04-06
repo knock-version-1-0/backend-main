@@ -27,7 +27,7 @@ class NoteConsumer(AsyncWebsocketConsumer):
             self.room_group_name, {"type": "note_message", "message": message}
         )
     
-    async def _message(self, event):
+    async def note_message(self, event):
         message = event["message"]
 
         await self.send(text_data=json.dumps({"message": message}))

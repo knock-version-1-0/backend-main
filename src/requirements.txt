@@ -9,3 +9,4 @@ daphne
 channels_redis
 PyJWT
 mixer
+pydantic==1.10.5

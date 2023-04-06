@@ -1,11 +1,14 @@
 import pytest
 from mixer.backend.django import mixer
 
-from notes.models import Note
+from apps.notes.models import Note
 
 
 @pytest.mark.django_db(transaction=True)
 def test_note_constraints():
+    """
+    Note name 관련 무결성 검사
+    """
     author = mixer.blend('users.User')
     name = 'Test Note'
     note1 = Note.objects.create(author=author, name=name)

@@ -12,5 +12,8 @@ pytest
 echo "django orm migrate"
 python manage.py migrate
 
+echo "load data"
+python manage.py loaddata ./frozen.json
+
 echo "runserver"
 python manage.py runserver 0.0.0.0:8000
