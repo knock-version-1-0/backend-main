@@ -1,13 +1,15 @@
 from .models import (
     Note,
     Keyword,
-    Position
+    Position,
 )
 from domains.interfaces.notes_repository import (
     NoteRepository as NoteRepositoryInterface
 )
+from core.models import StatusChoice
 
 from django.db.models import Prefetch
+from django.db.utils import IntegrityError
 
 
 class NoteRepository(NoteRepositoryInterface):
@@ -20,9 +22,15 @@ class NoteRepository(NoteRepositoryInterface):
         self.KeywordPositionEntity = keyword_position_entity_cls
 
     def find_by_name(self, name):
-        note = Note.objects.prefetch_related(
-            Prefetch('keywords', queryset=Keyword.objects.prefetch_related('positions'))
-        ).get(name=name, author=self.user)
+        try:
+            note = Note.objects.prefetch_related(
+                Prefetch('keywords', queryset=Keyword.objects.prefetch_related('positions'))
+            ).filter(status=StatusChoice.SAVE).get(name=name, author=self.user)
+        except Note.DoesNotExist as e:
+            raise e
+        except IntegrityError as e:
+            raise e
+
         self.set_model_instance(note)
         
         keywords = list(map(
