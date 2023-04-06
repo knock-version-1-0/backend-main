@@ -15,3 +15,7 @@
 [https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq](https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq)
 
 ![ERD](https://user-images.githubusercontent.com/82345753/230266463-19eea9f5-235b-431e-808c-0faedd94b7fc.png)
+
+## API Doc
+
+[https://app.swaggerhub.com/apis-docs/jinhyeok15/knock_api/1.0.0#](https://app.swaggerhub.com/apis-docs/jinhyeok15/knock_api/1.0.0#)
