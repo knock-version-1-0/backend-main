@@ -21,3 +21,5 @@
 ## ERD
 
 [https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq](https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq)
+
+<img width="1101" alt="image" src="https://user-images.githubusercontent.com/82345753/230266463-19eea9f5-235b-431e-808c-0faedd94b7fc.png">
