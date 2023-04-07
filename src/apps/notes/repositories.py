@@ -7,8 +7,6 @@ from domains.interfaces.notes_repository import (
 )
 from core.models import StatusChoice
 
-from django.db.utils import IntegrityError
-
 
 class NoteRepository(NoteRepositoryInterface):
     def __init__(self, context: dict):
