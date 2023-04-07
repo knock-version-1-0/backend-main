@@ -1,21 +1,23 @@
 from typing import List
+import uuid
 
-from pydantic import BaseModel
-
-
-class NoteEntity(BaseModel):
-    author_id: int
-    display_id: str
-    name: str
-    keywords: List['KeywordEntity'] = []
-    status: int
+from pydantic import BaseModel, validator
 
 
 class KeywordEntity(BaseModel):
-    note_id: int
-    positions: List['KeywordPositionEntity'] = []
-
-
-class KeywordPositionEntity(BaseModel):
-    keyword_id: int
+    noteId: int
     order: int
+
+
+class NoteEntity(BaseModel):
+    displayId: str
+    authorId: int
+    name: str
+    keywords: List[KeywordEntity] = []
+    status: int
+
+    @validator('displayId', pre=True)
+    def uuid_to_str(cls, v):
+        if isinstance(v, uuid.UUID):
+            return str(v)
+        return v

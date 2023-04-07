@@ -28,18 +28,8 @@ class Note(TimestampedModel):
 
 class Keyword(models.Model):
     note = models.ForeignKey(Note, related_name='keywords', on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'notes_keyword'
-
-
-class Position(models.Model):
-    keyword = models.ForeignKey(Keyword, related_name='positions', on_delete=models.CASCADE)
     order = models.IntegerField(unique=True)
 
     class Meta:
-        db_table = 'notes_position'
-        constraints = [
-            models.UniqueConstraint(fields=['order', 'keyword'], name='keyword_position_order_integrity')
-        ]
+        db_table = 'notes_keyword'
         ordering = ['order',]
