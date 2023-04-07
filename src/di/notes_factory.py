@@ -7,7 +7,7 @@ from domains.entities.notes_entity import (
 from domains.usecases.notes_usecase import NoteUsecase
 from adapters.dto.notes_dto import (
     NoteResDto,
-    KeywordResDto
+    KeywordBaseDto
 )
 
 
@@ -24,5 +24,5 @@ class NoteFactory(BaseFactory):
         return NoteUsecase(
             self.repository, {
             'NoteResDto': NoteResDto,
-            'KeywordResDto': KeywordResDto
+            'KeywordBaseDto': KeywordBaseDto
         })

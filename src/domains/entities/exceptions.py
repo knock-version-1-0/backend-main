@@ -16,8 +16,8 @@ class NoteNameIntegrityError(IntegrityError):
         super().__init__(self.message, *args)
 
 
-class KeywordPositionOrderIntegrityError(IntegrityError):
-    message = "동일한 Keyword 내에서 Position.order는 중복될 수 없습니다."
+class KeywordPosIdIntegrityError(IntegrityError):
+    message = "동일한 Keyword 내에서 posId는 중복될 수 없습니다."
     type = IntegrityError
     def __init__(self, *args):
         super().__init__(self.message, *args)

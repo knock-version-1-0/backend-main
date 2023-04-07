@@ -1,8 +1,31 @@
 import uuid
 
-from django.db import models
+from django.db import models, transaction
+from django.db.utils import IntegrityError
 
 from core.models import TimestampedModel, StatusField
+
+
+class NoteManager(models.Manager):
+    def create(self, author, keywords, **kwargs):
+        with transaction.atomic():
+            try:
+                note = super().create(
+                    author=author,
+                    **kwargs
+                )
+            except IntegrityError:
+                raise IntegrityError('note_integrity_error')
+            
+            try:
+                keywords = [Keyword.objects.create(
+                    note=note,
+                    pos_id=k['posId']
+                ) for k in keywords]
+            except IntegrityError:
+                raise IntegrityError('keyword_integrity_error')
+
+        return note
 
 
 class Note(TimestampedModel):
@@ -10,6 +33,8 @@ class Note(TimestampedModel):
     display_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=25)
     status = StatusField
+
+    objects = NoteManager()
 
     class Meta:
         db_table = 'notes_note'
@@ -28,11 +53,11 @@ class Note(TimestampedModel):
 
 class Keyword(models.Model):
     note = models.ForeignKey(Note, related_name='keywords', on_delete=models.CASCADE)
-    order = models.IntegerField()
+    pos_id = models.IntegerField()
 
     class Meta:
         db_table = 'notes_keyword'
-        ordering = ['order',]
+        ordering = ['pos_id',]
         constraints = [
-            models.UniqueConstraint(fields=['order', 'note'], name='keyword_order_integrity')
+            models.UniqueConstraint(fields=['pos_id', 'note'], name='keyword_pos_id_integrity')
         ]

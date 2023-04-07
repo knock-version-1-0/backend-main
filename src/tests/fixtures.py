@@ -18,7 +18,7 @@ def note_entity_fixture() -> NoteEntity:
         name='note1',
         keywords=[KeywordEntity(
             noteId=1,
-            order=i
+            posId=i
         ) for i in range(1, 22, 2)],
         status=StatusChoice.SAVE
     )

@@ -6,7 +6,7 @@ from pydantic import BaseModel, validator
 
 class KeywordEntity(BaseModel):
     noteId: int
-    order: int
+    posId: int
 
 
 class NoteEntity(BaseModel):

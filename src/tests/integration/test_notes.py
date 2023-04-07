@@ -1,3 +1,4 @@
+import uuid
 import pytest
 
 from mixer.backend.django import mixer
@@ -9,9 +10,13 @@ from apps.notes.models import (
 from core.models import StatusChoice
 from domains.entities.exceptions import (
     NoteNameIntegrityError,
-    KeywordPositionOrderIntegrityError,
+    KeywordPosIdIntegrityError,
     NoteDoesNotExistError,
     RepositoryAuthorizeError
+)
+from adapters.dto.notes_dto import (
+    NoteReqDto,
+    KeywordBaseDto
 )
 from di.notes_factory import NoteFactory
 
@@ -21,54 +26,68 @@ def test_note_name_integrity():
     """
     동일한 Author일 경우 Note.name을 중복해서 등록할 수 없습니다.
     """
-    author = mixer.blend('users.User')
-    name = 'Test Note'
-    note1 = Note.objects.create(author=author, name=name)
-    
-    # Test that creating a note with the same name and author raises an IntegrityError
+    user = mixer.blend('users.User')
+    usecase = NoteFactory().usecase
+    keyword_size = 16
+
+    create_note = lambda name, user: usecase.create(NoteReqDto(
+        displayId=str(uuid.uuid4()),
+        name=name,
+        keywords=[KeywordBaseDto(posId=i) for i in range(keyword_size)],
+        status=StatusChoice.SAVE
+    ), user_id=user.pk)
+
+    name = 'name'
+    create_note(name, user)
+
     with pytest.raises(NoteNameIntegrityError.type):
-        note2 = Note.objects.create(author=author, name=name)
+        create_note(name, user)
+    
+    create_note('name1', user)
 
-    # Test that creating a note with a different name and the same author does not raise an error
-    note3 = Note.objects.create(author=author, name='Another Note')
-
-    # Test that creating a note with the same name but a different author does not raise an error
-    author2 = mixer.blend('users.User')
-    note4 = Note.objects.create(author=author2, name=name)
+    user = mixer.blend('users.User')
+    create_note(name, user)
 
 
 @pytest.mark.django_db(transaction=True)
-def test_keyword_order_integrity():
+def test_keyword_pos_id_integrity():
     """
-    Keyword.order는 Note내에서 중복을 허용하지 않습니다.
+    Keyword.posId는 Note내에서 중복을 허용하지 않습니다.
     """
-    note1 = mixer.blend('notes.Note')
-    note2 = mixer.blend('notes.Note')
+    usecase = NoteFactory().usecase
+    user = mixer.blend('users.User')
 
-    obj = Keyword.objects.create(note=note1, order=1)
+    create_note = lambda name, keywords: usecase.create(NoteReqDto(
+        displayId=str(uuid.uuid4()),
+        name=name,
+        keywords=keywords,
+        status=StatusChoice.SAVE
+    ), user_id=user.pk)
 
-    with pytest.raises(KeywordPositionOrderIntegrityError.type):
-        obj = Keyword.objects.create(note=note1, order=1)
-
-    obj = Keyword.objects.create(note=note2, order=1)
+    keywords = [KeywordBaseDto(posId=1) for _ in range(4)]
+    with pytest.raises(KeywordPosIdIntegrityError.type):
+        create_note('name1', keywords)
+    
+    keywords = [KeywordBaseDto(posId=i) for i in range(4)]
+    create_note('name2', keywords)
 
 
 @pytest.mark.django_db
 def test_keyword_order_by():
     """
-    Keyword는 Keyword.order 별로 정렬됩니다.
+    Keyword는 Keyword.posId 별로 정렬됩니다.
     """
     note = mixer.blend('notes.Note')
 
-    for i in range(10, 0, -1):
+    for i in range(9, -1, -1):
         Keyword.objects.create(
             note=note,
-            order=i
+            pos_id=i
         )
     
     keywords = Keyword.objects.filter(note=note)
     for i in range(10):
-        assert keywords[i].order == i+1
+        assert keywords[i].pos_id == i
 
 
 @pytest.mark.django_db

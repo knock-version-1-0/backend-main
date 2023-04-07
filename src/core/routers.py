@@ -3,6 +3,9 @@ from rest_framework.routers import SimpleRouter
 from django.urls import re_path
 
 
+TRAILING_SLASH = False
+
+
 class Router(SimpleRouter):
     """
     Rewrite SimpleRouter to inject viewset_factory on viewset
@@ -40,7 +43,7 @@ class Router(SimpleRouter):
                 regex = route.url.format(
                     prefix=prefix,
                     lookup=lookup,
-                    trailing_slash=self.trailing_slash
+                    trailing_slash=TRAILING_SLASH
                 )
 
                 # If there is no prefix, the first part of the url is probably

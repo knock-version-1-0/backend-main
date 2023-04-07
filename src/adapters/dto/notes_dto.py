@@ -1,15 +1,22 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 
-class KeywordResDto(BaseModel):
-    order: int
+class KeywordBaseDto(BaseModel):
+    posId: int
 
 
 class NoteResDto(BaseModel):
-    displayId: str
     authorId: int
+    displayId: str
     name: str
-    keywords: List[KeywordResDto]
+    keywords: List[KeywordBaseDto]=[]
     status: int
+
+
+class NoteReqDto(BaseModel):
+    displayId: Optional[str]
+    name: Optional[str]
+    keywords: List[KeywordBaseDto]=[]
+    status: Optional[int]

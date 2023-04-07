@@ -24,7 +24,7 @@ class NoteRepository(NoteRepositoryInterface):
             displayId=note.display_id,
             authorId=note.author.pk,
             name=note.name,
-            keywords=[self.KeywordEntity(noteId=k.note.id, order=k.order) for k in note.keywords.all()],
+            keywords=[self.KeywordEntity(noteId=k.note.id, posId=k.pos_id) for k in note.keywords.all()],
             status=note.status
         )
 
@@ -34,4 +34,4 @@ class NoteRepository(NoteRepositoryInterface):
         if bool(instance):
             instance.update(**kwargs)
         else:
-            Note.objects.create(**kwargs)
+            Note.objects.create(author=self.user, **kwargs)

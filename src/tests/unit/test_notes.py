@@ -9,10 +9,6 @@ from domains.entities.notes_entity import (
     NoteEntity,
     KeywordEntity,
 )
-from domains.entities.exceptions import (
-    NoteNameIntegrityError,
-    KeywordPositionOrderIntegrityError
-)
 
 
 @pytest.mark.unit
@@ -44,11 +40,11 @@ def test_keyword_entity_consistency(note_entity_fixture):
     ```yaml
     Keyword:
         noteId: integer
-        order: integer
+        posId: integer
     ```
     """
     keywords: List[KeywordEntity] = note_entity_fixture.keywords
 
     for keyword in keywords:
         assert isinstance(keyword.noteId, int)
-        assert isinstance(keyword.order, int)
+        assert isinstance(keyword.posId, int)
