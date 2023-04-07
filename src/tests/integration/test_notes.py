@@ -40,7 +40,7 @@ def test_note_name_integrity():
     name = 'name'
     create_note(name, user)
 
-    with pytest.raises(NoteNameIntegrityError.type):
+    with pytest.raises(NoteNameIntegrityError):
         create_note(name, user)
     
     create_note('name1', user)
@@ -65,7 +65,7 @@ def test_keyword_pos_id_integrity():
     ), user_id=user.pk)
 
     keywords = [KeywordBaseDto(posId=1) for _ in range(4)]
-    with pytest.raises(KeywordPosIdIntegrityError.type):
+    with pytest.raises(KeywordPosIdIntegrityError):
         create_note('name1', keywords)
     
     keywords = [KeywordBaseDto(posId=i) for i in range(4)]
