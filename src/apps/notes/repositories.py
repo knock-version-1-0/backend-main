@@ -11,27 +11,20 @@ from django.db.utils import IntegrityError
 
 
 class NoteRepository(NoteRepositoryInterface):
-    def __init__(self,
-                 note_entity_cls,
-                 keyword_entity_cls):
-        self.NoteEntity = note_entity_cls
-        self.KeywordEntity = keyword_entity_cls
+    def __init__(self, context: dict):
+        self.NoteEntity = context['NoteEntity']
+        self.KeywordEntity = context['KeywordEntity']
 
     def find_by_name(self, name):
-        try:
-            note = Note.objects.prefetch_related('keywords').filter(
-                status=StatusChoice.SAVE
-            ).get(name=name, author=self.user)
-        except Note.DoesNotExist as e:
-            raise e
-        except IntegrityError as e:
-            raise e
+        note = Note.objects.prefetch_related('keywords').filter(
+            status=StatusChoice.SAVE
+        ).get(name=name, author=self.user)
 
         self.set_model_instance(note)
 
         return self.NoteEntity(
             displayId=note.display_id,
-            authorId=note.author,
+            authorId=note.author.pk,
             name=note.name,
             keywords=[self.KeywordEntity(noteId=k.note.id, order=k.order) for k in note.keywords.all()],
             status=note.status
