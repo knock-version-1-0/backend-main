@@ -10,7 +10,7 @@ from apps.notes.models import (
 
 
 @pytest.mark.django_db(transaction=True)
-def test_note_constraints():
+def test_note_name_integrity():
     """
     동일한 Author일 경우 Note.name을 중복해서 등록할 수 없습니다.
     """
@@ -28,6 +28,22 @@ def test_note_constraints():
     # Test that creating a note with the same name but a different author does not raise an error
     author2 = mixer.blend('users.User')
     note4 = Note.objects.create(author=author2, name=name)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_keyword_order_integrity():
+    """
+    Keyword.order는 Note내에서 중복을 허용하지 않습니다.
+    """
+    note1 = mixer.blend('notes.Note')
+    note2 = mixer.blend('notes.Note')
+
+    obj = Keyword.objects.create(note=note1, order=1)
+
+    with pytest.raises(IntegrityError):
+        obj = Keyword.objects.create(note=note1, order=1)
+
+    obj = Keyword.objects.create(note=note2, order=1)
 
 
 @pytest.mark.django_db

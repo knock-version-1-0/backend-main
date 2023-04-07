@@ -13,11 +13,9 @@ from django.db.utils import IntegrityError
 class NoteRepository(NoteRepositoryInterface):
     def __init__(self,
                  note_entity_cls,
-                 keyword_entity_cls,
-                 keyword_position_entity_cls):
+                 keyword_entity_cls):
         self.NoteEntity = note_entity_cls
         self.KeywordEntity = keyword_entity_cls
-        self.KeywordPositionEntity = keyword_position_entity_cls
 
     def find_by_name(self, name):
         try:
@@ -30,14 +28,12 @@ class NoteRepository(NoteRepositoryInterface):
             raise e
 
         self.set_model_instance(note)
-        
-        keywords = [self.KeywordEntity(noteId=k.note.id, order=k.order) for k in note.keywords.all()]
 
         return self.NoteEntity(
             displayId=note.display_id,
             authorId=note.author,
             name=note.name,
-            keywords=keywords,
+            keywords=[self.KeywordEntity(noteId=k.note.id, order=k.order) for k in note.keywords.all()],
             status=note.status
         )
 
