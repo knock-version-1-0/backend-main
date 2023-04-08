@@ -14,6 +14,10 @@ from domains.exceptions import (
     IntegrityError,
     DatabaseError
 )
+from domains.entities.notes_entity import (
+    NoteEntity,
+    KeywordEntity,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +72,9 @@ class NoteUsecase(BaseUsecase):
             raise AuthorizeNotCalledError()
 
         except IntegrityError as e:
-            if e.args[0] == 'Note':
+            if e.args[0] == NoteEntity.__name__.replace('Entity', ''):
                 raise NoteNameIntegrityError()
-            if e.args[0] == 'Keyword':
+            if e.args[0] == KeywordEntity.__name__.replace('Entity', ''):
                 raise KeywordPosIdIntegrityError()
         
         except Exception as e:
