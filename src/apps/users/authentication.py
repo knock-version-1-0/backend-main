@@ -1,10 +1,16 @@
 import jwt
+import datetime
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from rest_framework import authentication, exceptions, status
+from django.utils.translation import gettext_lazy as _
 
-from rest_framework import authentication, exceptions
 
-from .models import User
+class JWTTokenExpired(exceptions.APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = _('Token이 만료되었습니다.')
+    default_code = 'TOKEN_EXPIRED'
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
@@ -75,15 +81,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
         except:
             msg = 'Invalid authentication. Could not decode token.'
             raise exceptions.AuthenticationFailed(msg)
+        
+        current_time = datetime.datetime.now().timestamp()
+        if current_time > payload['exp']:
+            raise JWTTokenExpired()
 
-        try:
-            user = User.objects.get(pk=payload['id'])
-        except User.DoesNotExist:
-            msg = 'No user matching this token was found.'
-            raise exceptions.AuthenticationFailed(msg)
-
-        if not user.is_active:
-            msg = 'This user has been deactivated.'
-            raise exceptions.AuthenticationFailed(msg)
-
-        return (user, token)
+        User = get_user_model()
+        return (User(payload['id']), None)
