@@ -2,6 +2,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from core.utils.pydantic import RequestBody
+
 
 class KeywordDto(BaseModel):
     noteId: Optional[int]
@@ -17,8 +19,5 @@ class NoteDto(BaseModel):
     status: int
 
 
-class NoteReqDto(BaseModel):
-    displayId: Optional[str]
-    name: Optional[str]
-    keywords: List[KeywordDto]=[]
-    status: Optional[int]
+class NoteReqDto(RequestBody, NoteDto):
+    pass
