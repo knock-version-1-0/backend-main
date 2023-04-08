@@ -8,6 +8,7 @@ class KeywordBaseDto(BaseModel):
 
 
 class NoteResDto(BaseModel):
+    id: int
     authorId: int
     displayId: str
     name: str

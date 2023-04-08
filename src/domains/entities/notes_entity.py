@@ -10,6 +10,7 @@ class KeywordEntity(BaseModel):
 
 
 class NoteEntity(BaseModel):
+    id: int
     displayId: str
     authorId: int
     name: str

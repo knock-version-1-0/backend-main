@@ -16,6 +16,7 @@ def test_note_entity_consistency(note_entity_fixture):
     """
     ```yaml
     Note:
+        id: integer
         authorId: integer
         displayId: string
         name: string
@@ -26,6 +27,7 @@ def test_note_entity_consistency(note_entity_fixture):
 
     assert isinstance(note_entity_fixture, NoteEntity)
 
+    assert isinstance(note_entity_fixture.id, int)
     assert isinstance(note_entity_fixture.authorId, int)
     assert isinstance(note_entity_fixture.displayId, str)
     assert isinstance(note_entity_fixture.name, str)

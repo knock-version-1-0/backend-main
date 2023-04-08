@@ -21,6 +21,7 @@ class NoteRepository(NoteRepositoryInterface):
         self.set_model_instance(note)
 
         return self.NoteEntity(
+            id=note.pk,
             displayId=note.display_id,
             authorId=note.author.pk,
             name=note.name,

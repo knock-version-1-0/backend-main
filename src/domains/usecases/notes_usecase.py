@@ -28,6 +28,7 @@ class NoteUsecase(BaseUsecase):
             raise RepositoryAuthorizeError()
 
         return self.NoteResDto(
+            id=entity.id,
             displayId=entity.displayId,
             authorId=entity.authorId,
             name=entity.name,
