@@ -1,4 +1,4 @@
-name: Django CI
+name: Backend CI
 
 on:
   push:
@@ -29,4 +29,5 @@ jobs:
     - name: Run Tests
       run: |
         cd src
+        mkdir knock/logs
         pytest
