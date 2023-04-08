@@ -1,3 +1,8 @@
+import logging
+from core.utils.decorators import authorize_required
+
+from core.usecase import BaseUsecase
+
 from domains.interfaces.notes_repository import (
     NoteRepository
 )
@@ -6,26 +11,39 @@ from domains.exceptions import (
     NoteDoesNotExistError,
     AuthorizeNotCalledError,
     KeywordPosIdIntegrityError,
-    IntegrityError
+    IntegrityError,
+    DatabaseError
 )
-from core.usecase import BaseUsecase
+
+logger = logging.getLogger(__name__)
+
+__all__ = [
+    'NoteUsecase',
+]
 
 
 class NoteUsecase(BaseUsecase):
+
     def __init__(self, repository: NoteRepository, context: dict):
-        self.note_repo = repository
+        self.repository = repository
         self.NoteDto = context['NoteDto']
         self.KeywordDto = context['KeywordDto']
 
+    @authorize_required
     def retrieve(self, key: str, user_id: int):
-        self.note_repo.authorize(user_id)
-
         try:
-            entity = self.note_repo.find_by_name(name=key)
-        except NoteDoesNotExistError.type:
-            raise NoteDoesNotExistError()
-        except AuthorizeNotCalledError.type:
+            entity = self.repository.find_by_name(name=key)
+
+        except AuthorizeNotCalledError.error_type:
+            logger.error(AuthorizeNotCalledError.message)
             raise AuthorizeNotCalledError()
+
+        except NoteDoesNotExistError.error_type:
+            raise NoteDoesNotExistError()
+        
+        except Exception as e:
+            logger.debug(e)
+            raise DatabaseError()
 
         return self.NoteDto(
             id=entity.id,
@@ -36,20 +54,25 @@ class NoteUsecase(BaseUsecase):
             status=entity.status
         )
 
-    def create(self, req_body, user_id):
-        self.note_repo.authorize(user_id)
-
+    @authorize_required
+    def create(self, req_body, user_id: int):
         try:
-            self.note_repo.save(
+            self.repository.save(
                 display_id=req_body.displayId,
                 name=req_body.name,
                 status=req_body.status,
                 keywords=[k.dict() for k in req_body.keywords]
             )
-        except AuthorizeNotCalledError.type:
+
+        except AuthorizeNotCalledError.error_type:
             raise AuthorizeNotCalledError()
+
         except IntegrityError as e:
-            if e.args[0] == 'note_integrity_error':
+            if e.args[0] == 'Note':
                 raise NoteNameIntegrityError()
-            if e.args[0] == 'keyword_integrity_error':
+            if e.args[0] == 'Keyword':
                 raise KeywordPosIdIntegrityError()
+        
+        except Exception as e:
+            logger.debug(e)
+            raise DatabaseError()

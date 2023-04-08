@@ -15,7 +15,7 @@ class NoteManager(models.Manager):
                     **kwargs
                 )
             except IntegrityError:
-                raise IntegrityError('note_integrity_error')
+                raise IntegrityError(Note.__name__)
             
             try:
                 keywords = [Keyword.objects.create(
@@ -23,7 +23,7 @@ class NoteManager(models.Manager):
                     pos_id=k['posId']
                 ) for k in keywords]
             except IntegrityError:
-                raise IntegrityError('keyword_integrity_error')
+                raise IntegrityError(Keyword.__name__)
 
         return note
 

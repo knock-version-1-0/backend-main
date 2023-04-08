@@ -1,20 +1,17 @@
-from typing import Optional, Type
+from typing import Optional, Any
 
 from django.http.request import QueryDict
-
-
-dto = object
 
 
 class CRUDMixin:
     def list(self, query_param: Optional[QueryDict]=None, **variables):
         raise NotImplementedError()
 
-    def retrieve(self, key: object, **variables):
+    def retrieve(self, key: object, **variables) -> Any:
         raise NotImplementedError()
 
-    def create(self, req_body: dto, **variables):
+    def create(self, req_body: object, **variables) -> Any:
         raise NotImplementedError()
 
-    def update(self, key: object, req_body: dto, **variables):
+    def update(self, key: object, req_body: object, **variables) -> Any:
         raise NotImplementedError()

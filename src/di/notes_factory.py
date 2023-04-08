@@ -1,4 +1,5 @@
 from core.factory import BaseFactory
+
 from apps.notes.repositories import NoteRepository
 from domains.entities.notes_entity import (
     NoteEntity,
@@ -9,9 +10,16 @@ from adapters.dto.notes_dto import (
     NoteDto,
     KeywordDto
 )
+from adapters.services.notes_service import (
+    NoteService,
+)
+from adapters.controllers.notes_controller import (
+    NoteController,
+)
 
 
 class NoteFactory(BaseFactory):
+
     @property
     def repository(self):
         return NoteRepository({
@@ -26,3 +34,11 @@ class NoteFactory(BaseFactory):
             'NoteDto': NoteDto,
             'KeywordDto': KeywordDto
         })
+
+    @property
+    def service(self):
+        return NoteService(self.usecase)
+
+    @property
+    def controller(self):
+        return NoteController(self.service)

@@ -1,3 +1,6 @@
+from typing import Optional
+
+from core.factory import BaseFactory
 from rest_framework.routers import SimpleRouter
 
 from django.urls import re_path
@@ -11,7 +14,7 @@ class Router(SimpleRouter):
     Rewrite SimpleRouter to inject viewset_factory on viewset
     """
 
-    def register(self, prefix, viewset, basename=None, factory=None):
+    def register(self, prefix, viewset, basename=None, factory: Optional[BaseFactory]=None):
         if basename is None:
             basename = self.get_default_basename(viewset)
         if factory is None:
@@ -57,7 +60,7 @@ class Router(SimpleRouter):
                 initkwargs.update({
                     'basename': basename,
                     'detail': route.detail,
-                    'viewset_factory': factory
+                    'controller': factory.controller
                 })
 
                 view = viewset.as_view(mapping, **initkwargs)

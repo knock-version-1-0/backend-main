@@ -2,10 +2,16 @@ from .models import (
     Note,
     Keyword,
 )
+
 from domains.interfaces.notes_repository import (
     NoteRepository as NoteRepositoryInterface
 )
+
 from core.models import StatusChoice
+
+__all__ = [
+    'NoteRepository',
+]
 
 
 class NoteRepository(NoteRepositoryInterface):

@@ -104,7 +104,7 @@ def test_note_exists():
     repo = factory.repository
     repo.authorize(user.pk)
 
-    with pytest.raises(NoteDoesNotExistError.type):
+    with pytest.raises(NoteDoesNotExistError.error_type):
         repo.find_by_name('note')
     repo.find_by_name(note1.name)
 
@@ -128,6 +128,6 @@ def test_note_saved():
     repo = factory.repository
     repo.authorize(user.pk)
 
-    with pytest.raises(NoteDoesNotExistError.type):
+    with pytest.raises(NoteDoesNotExistError.error_type):
         repo.find_by_name(note.name)
     repo.find_by_name(note1.name)

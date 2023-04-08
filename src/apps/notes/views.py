@@ -1,10 +1,19 @@
 # notes/views.py
-from django.shortcuts import render
+from rest_framework.request import HttpRequest
+from rest_framework.response import Response
+from rest_framework import viewsets
 
 
-def index(request):
-    return render(request, "notes/index.html")
+class NoteViewSet(viewsets.ViewSet):
+    controller = None
 
-
-def room(request, room_name):
-    return render(request, "notes/room.html", {"room_name": room_name})
+    def get(self, request: HttpRequest, name: str) -> Response:
+        return self.controller.retrieve(
+            request=request,
+            key=name
+        )
+    
+    def post(self, request: HttpRequest) -> Response:
+        return self.controller.create(
+            request=request
+        )

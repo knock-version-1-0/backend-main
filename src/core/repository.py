@@ -1,7 +1,7 @@
 from typing import Optional
 
 from django.contrib.auth import get_user_model
-from domains.exceptions import RepositoryAuthorizeError
+from domains.exceptions import UserInvalidError
 
 
 class BaseRepository:
@@ -27,4 +27,4 @@ class BaseRepository:
         try:
             self.user = User.objects.filter(is_active=True).get(pk=user_id)
         except User.DoesNotExist:
-            raise RepositoryAuthorizeError()
+            raise UserInvalidError()

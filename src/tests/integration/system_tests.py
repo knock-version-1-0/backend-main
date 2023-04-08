@@ -8,7 +8,7 @@ from tests.fixtures import (
 from core.repository import BaseRepository
 from domains.exceptions import (
     AuthorizeNotCalledError,
-    RepositoryAuthorizeError
+    UserInvalidError
 )
 
 
@@ -20,7 +20,7 @@ def test_is_user_authorized():
     user = mixer.blend('users.User')
 
     repo = BaseRepository()
-    with pytest.raises(AuthorizeNotCalledError.type):
+    with pytest.raises(AuthorizeNotCalledError.error_type):
         repo.user
 
     repo.authorize(user.pk)
@@ -38,8 +38,8 @@ def test_repository_authorize(user_fixture):
 
     user_fixture.is_active = False
     user_fixture.save()
-    with pytest.raises(RepositoryAuthorizeError):
+    with pytest.raises(UserInvalidError):
         repo.authorize(user_id)
     
-    with pytest.raises(RepositoryAuthorizeError):
+    with pytest.raises(UserInvalidError):
         repo.authorize(2)

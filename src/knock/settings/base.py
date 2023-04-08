@@ -181,7 +181,7 @@ LOGGING = {
             'formatter': 'verbose',
         },
         'file': {
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'filters': ['require_debug_false'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs/app.log',
