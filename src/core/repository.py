@@ -1,8 +1,11 @@
+from typing import Optional
+
 from django.contrib.auth import get_user_model
+from domains.exceptions import RepositoryAuthorizeError
 
 
 class BaseRepository:
-    def __init__(self, context: dict, **kwargs): ...
+    def __init__(self, context: Optional[dict]=None, **kwargs): ...
 
     def find_all(self, *args, **kwargs): ...
 
@@ -20,4 +23,8 @@ class BaseRepository:
         self.__model_instance = model
 
     def authorize(self, user_id):
-        self.user = get_user_model().objects.get(pk=user_id)
+        User = get_user_model()
+        try:
+            self.user = User.objects.filter(is_active=True).get(pk=user_id)
+        except User.DoesNotExist:
+            raise RepositoryAuthorizeError()

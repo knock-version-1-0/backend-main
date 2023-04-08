@@ -2,16 +2,21 @@ import uuid
 import pytest
 
 from mixer.backend.django import mixer
+from tests.fixtures import (
+    user_fixture,
+)
 
 from apps.notes.models import (
     Note,
     Keyword,
 )
 from core.models import StatusChoice
-from domains.entities.exceptions import (
+from core.repository import BaseRepository
+from domains.exceptions import (
     NoteNameIntegrityError,
     KeywordPosIdIntegrityError,
     NoteDoesNotExistError,
+    AuthorizeNotCalledError,
     RepositoryAuthorizeError
 )
 from adapters.dto.notes_dto import (
@@ -137,18 +142,31 @@ def test_note_saved():
 @pytest.mark.django_db
 def test_is_user_authorized():
     """
-    Note는 User만 조회할 수 있습니다.
+    Call user from repository after authorize method is called
     """
     user = mixer.blend('users.User')
-    note = mixer.blend('notes.Note',
-                       author=user,
-                       name='note1',
-                       status=StatusChoice.SAVE)
 
-    factory = NoteFactory()
-    repo = factory.repository
-    with pytest.raises(RepositoryAuthorizeError.type):
-        repo.find_by_name(note.name)
+    repo = BaseRepository()
+    with pytest.raises(AuthorizeNotCalledError.type):
+        repo.user
 
     repo.authorize(user.pk)
-    repo.find_by_name(note.name)
+    repo.user
+
+
+@pytest.mark.django_db
+def test_repository_authorize(user_fixture):
+    """
+    Repository authorize method test
+    """
+    user_id = user_fixture.id
+    repo = BaseRepository()
+    repo.authorize(user_id)
+
+    user_fixture.is_active = False
+    user_fixture.save()
+    with pytest.raises(RepositoryAuthorizeError):
+        repo.authorize(user_id)
+    
+    with pytest.raises(RepositoryAuthorizeError):
+        repo.authorize(2)

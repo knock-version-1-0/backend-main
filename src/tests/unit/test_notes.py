@@ -3,7 +3,7 @@ from typing import List
 import pytest
 
 from tests.fixtures import (
-    note_entity_fixture
+    note_entity_fixture,
 )
 from domains.entities.notes_entity import (
     NoteEntity,

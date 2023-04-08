@@ -23,8 +23,14 @@ class KeywordPosIdIntegrityError(IntegrityError):
         super().__init__(self.message, *args)
 
 
-class RepositoryAuthorizeError(AttributeError):
+class AuthorizeNotCalledError(AttributeError):
     message = "find_by 메소드를 호출하기 전에 authorize 메소드를 호출해야 합니다."
     type = AttributeError
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
+class RepositoryAuthorizeError(Exception):
+    message = "User invalid"
     def __init__(self, *args):
         super().__init__(self.message, *args)

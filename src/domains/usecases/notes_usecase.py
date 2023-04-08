@@ -1,10 +1,10 @@
 from domains.interfaces.notes_repository import (
     NoteRepository
 )
-from domains.entities.exceptions import (
+from domains.exceptions import (
     NoteNameIntegrityError,
     NoteDoesNotExistError,
-    RepositoryAuthorizeError,
+    AuthorizeNotCalledError,
     KeywordPosIdIntegrityError,
     IntegrityError
 )
@@ -24,8 +24,8 @@ class NoteUsecase(BaseUsecase):
             entity = self.note_repo.find_by_name(name=key)
         except NoteDoesNotExistError.type:
             raise NoteDoesNotExistError()
-        except RepositoryAuthorizeError.type:
-            raise RepositoryAuthorizeError()
+        except AuthorizeNotCalledError.type:
+            raise AuthorizeNotCalledError()
 
         return self.NoteResDto(
             id=entity.id,
@@ -46,8 +46,8 @@ class NoteUsecase(BaseUsecase):
                 status=req_body.status,
                 keywords=[k.dict() for k in req_body.keywords]
             )
-        except RepositoryAuthorizeError.type:
-            raise RepositoryAuthorizeError()
+        except AuthorizeNotCalledError.type:
+            raise AuthorizeNotCalledError()
         except IntegrityError as e:
             if e.args[0] == 'note_integrity_error':
                 raise NoteNameIntegrityError()

@@ -8,6 +8,7 @@ from domains.entities.notes_entity import (
     KeywordEntity
 )
 from core.models import StatusChoice
+from apps.users.models import User
 
 
 @pytest.fixture
@@ -23,3 +24,9 @@ def note_entity_fixture() -> NoteEntity:
         ) for i in range(0, 20, 2)],
         status=StatusChoice.SAVE
     )
+
+
+@pytest.fixture
+def user_fixture() -> User:
+    user = User.objects.create_user('fixture_user')
+    return user
