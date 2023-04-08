@@ -9,6 +9,10 @@ from adapters.dto.notes_dto import (
     NoteDto,
 )
 
+__all__ = [
+    'NoteController',
+]
+
 
 class NoteController(BaseController):
     

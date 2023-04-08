@@ -6,7 +6,6 @@ from . import views
 
 from di.notes_factory import NoteFactory
 
-
 router = Router()
 
 router.register(
