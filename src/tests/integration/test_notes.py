@@ -2,26 +2,20 @@ import uuid
 import pytest
 
 from mixer.backend.django import mixer
-from tests.fixtures import (
-    user_fixture,
-)
 
 from apps.notes.models import (
     Note,
     Keyword,
 )
 from core.models import StatusChoice
-from core.repository import BaseRepository
 from domains.exceptions import (
     NoteNameIntegrityError,
     KeywordPosIdIntegrityError,
     NoteDoesNotExistError,
-    AuthorizeNotCalledError,
-    RepositoryAuthorizeError
 )
 from adapters.dto.notes_dto import (
     NoteReqDto,
-    KeywordBaseDto
+    KeywordDto
 )
 from di.notes_factory import NoteFactory
 
@@ -38,7 +32,7 @@ def test_note_name_integrity():
     create_note = lambda name, user: usecase.create(NoteReqDto(
         displayId=str(uuid.uuid4()),
         name=name,
-        keywords=[KeywordBaseDto(posId=i) for i in range(keyword_size)],
+        keywords=[KeywordDto(posId=i) for i in range(keyword_size)],
         status=StatusChoice.SAVE
     ), user_id=user.pk)
 
@@ -69,11 +63,11 @@ def test_keyword_pos_id_integrity():
         status=StatusChoice.SAVE
     ), user_id=user.pk)
 
-    keywords = [KeywordBaseDto(posId=1) for _ in range(4)]
+    keywords = [KeywordDto(posId=1) for _ in range(4)]
     with pytest.raises(KeywordPosIdIntegrityError):
         create_note('name1', keywords)
     
-    keywords = [KeywordBaseDto(posId=i) for i in range(4)]
+    keywords = [KeywordDto(posId=i) for i in range(4)]
     create_note('name2', keywords)
 
 
@@ -137,36 +131,3 @@ def test_note_saved():
     with pytest.raises(NoteDoesNotExistError.type):
         repo.find_by_name(note.name)
     repo.find_by_name(note1.name)
-
-
-@pytest.mark.django_db
-def test_is_user_authorized():
-    """
-    Call user from repository after authorize method is called
-    """
-    user = mixer.blend('users.User')
-
-    repo = BaseRepository()
-    with pytest.raises(AuthorizeNotCalledError.type):
-        repo.user
-
-    repo.authorize(user.pk)
-    repo.user
-
-
-@pytest.mark.django_db
-def test_repository_authorize(user_fixture):
-    """
-    Repository authorize method test
-    """
-    user_id = user_fixture.id
-    repo = BaseRepository()
-    repo.authorize(user_id)
-
-    user_fixture.is_active = False
-    user_fixture.save()
-    with pytest.raises(RepositoryAuthorizeError):
-        repo.authorize(user_id)
-    
-    with pytest.raises(RepositoryAuthorizeError):
-        repo.authorize(2)

@@ -206,3 +206,6 @@ LOGGING = {
         },
     },
 }
+
+from datetime import timedelta
+JWT_TOKEN_EXPIRE_PERIOD = timedelta(days=7)

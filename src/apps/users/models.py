@@ -1,5 +1,5 @@
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.conf import settings
 
@@ -60,9 +60,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     def _generate_jwt_token(self):
         """
         Generates a JSON Web Token that stores this user's ID and has an expiry
-        date set to 7 days into the future.
+        date set to {EXPIRE_PERIOD} into the future.
         """
-        dt = datetime.now() + timedelta(days=7)
+        dt = datetime.now() + settings.JWT_TOKEN_EXPIRE_PERIOD
 
         token = jwt.encode({
             'id': self.pk,

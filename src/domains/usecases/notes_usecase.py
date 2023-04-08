@@ -14,8 +14,8 @@ from core.usecase import BaseUsecase
 class NoteUsecase(BaseUsecase):
     def __init__(self, repository: NoteRepository, context: dict):
         self.note_repo = repository
-        self.NoteResDto = context['NoteResDto']
-        self.KeywordBaseDto = context['KeywordBaseDto']
+        self.NoteDto = context['NoteDto']
+        self.KeywordDto = context['KeywordDto']
 
     def retrieve(self, key: str, user_id: int):
         self.note_repo.authorize(user_id)
@@ -27,12 +27,12 @@ class NoteUsecase(BaseUsecase):
         except AuthorizeNotCalledError.type:
             raise AuthorizeNotCalledError()
 
-        return self.NoteResDto(
+        return self.NoteDto(
             id=entity.id,
             displayId=entity.displayId,
             authorId=entity.authorId,
             name=entity.name,
-            keywords=[self.KeywordBaseDto(posId=k.posId) for k in entity.keywords],
+            keywords=[self.KeywordDto(noteId=k.noteId, posId=k.posId) for k in entity.keywords],
             status=entity.status
         )
 
