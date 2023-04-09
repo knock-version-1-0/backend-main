@@ -8,8 +8,8 @@ from core.service import BaseService, error_wrapper
 
 from adapters.dto.notes_dto import (
     NoteDto,
-    KeywordDto,
     NoteReqDto,
+    KeywordReqDto,
 )
 from domains.usecases.notes_usecase import (
     NoteUsecase
@@ -66,14 +66,11 @@ class NoteService(BaseService):
 
         return (obj, status_code)
 
-    def create(self, req_body: QueryDict, user_id: int) -> Tuple[Union[None, Code], StatusCode]:
+    def create(self, req_body: QueryDict, user_id: int) -> Tuple[Union[NoteDto, Code], StatusCode]:
         status_code = None
         parse = lambda o: NoteReqDto(
-            id=o['id'],
-            authorId=o['authorId'],
-            displayId=o['displayId'],
             name=o['name'],
-            keywords=[KeywordDto(noteId=k['noteId'], posId=k['posId']) for k in o['keywords']],
+            keywords=[KeywordReqDto(posId=k['posId']) for k in o['keywords']],
             status=o['status']
         )
 

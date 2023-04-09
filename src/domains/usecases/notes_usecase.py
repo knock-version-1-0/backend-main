@@ -61,8 +61,7 @@ class NoteUsecase(BaseUsecase):
     @authorize_required
     def create(self, req_body, user_id: int):
         try:
-            self.repository.save(
-                display_id=req_body.displayId,
+            entity = self.repository.save(
                 name=req_body.name,
                 status=req_body.status,
                 keywords=[k.dict() for k in req_body.keywords]
@@ -80,3 +79,12 @@ class NoteUsecase(BaseUsecase):
         except Exception as e:
             logger.debug(e)
             raise DatabaseError()
+
+        return self.NoteDto(
+            id=entity.id,
+            displayId=entity.displayId,
+            authorId=entity.authorId,
+            name=entity.name,
+            keywords=[self.KeywordDto(noteId=k.noteId, posId=k.posId) for k in entity.keywords],
+            status=entity.status
+        )

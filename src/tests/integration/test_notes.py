@@ -1,4 +1,3 @@
-import uuid
 import pytest
 
 from mixer.backend.django import mixer
@@ -30,7 +29,6 @@ def test_note_name_integrity():
     keyword_size = 16
 
     create_note = lambda name, user: usecase.create(NoteReqDto(
-        displayId=str(uuid.uuid4()),
         name=name,
         keywords=[KeywordDto(posId=i) for i in range(keyword_size)],
         status=StatusChoice.SAVE
@@ -57,7 +55,6 @@ def test_keyword_pos_id_integrity():
     user = mixer.blend('users.User')
 
     create_note = lambda name, keywords: usecase.create(NoteReqDto(
-        displayId=str(uuid.uuid4()),
         name=name,
         keywords=keywords,
         status=StatusChoice.SAVE

@@ -28,4 +28,6 @@ class NoteController(BaseController):
     
     def create(self, request: HttpRequest) -> Response:
         payload, status = self.service.create(request.data, user_id=request.user.pk)
+        if isinstance(payload, NoteDto):
+            return Response(payload.dict(), status=status)
         return Response(payload, status=status)
