@@ -4,16 +4,21 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 
 
-class NoteViewSet(viewsets.ViewSet):
+class NoteListViewSet(viewsets.ViewSet):
     controller = None
+    
+    def create(self, request: HttpRequest) -> Response:
+        return self.controller.create(
+            request=request
+        )
 
-    def get(self, request: HttpRequest, name: str) -> Response:
+
+class NoteDetailViewset(viewsets.ViewSet):
+    controller = None
+    lookup_field = 'name'
+
+    def retrieve(self, request: HttpRequest, name: str) -> Response:
         return self.controller.retrieve(
             request=request,
             key=name
-        )
-    
-    def post(self, request: HttpRequest) -> Response:
-        return self.controller.create(
-            request=request
         )

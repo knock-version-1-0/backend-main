@@ -9,10 +9,14 @@ from di.notes_factory import NoteFactory
 router = Router()
 
 router.register(
-    '', views.NoteViewSet, basename='note', factory=NoteFactory()
+    '', views.NoteListViewSet, basename='notes', factory=NoteFactory()
+)
+
+router.register(
+    '', views.NoteDetailViewset, basename='notes', factory=NoteFactory()
 )
 
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('notes/', include(router.urls))
 ]
