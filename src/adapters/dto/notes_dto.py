@@ -19,11 +19,11 @@ class NoteDto(BaseModel):
     status: int
 
 
-class NoteReqDto(RequestBody, BaseModel):
-    name: str
-    keywords: List[KeywordDto]=[]
-    status: int
-
-
 class KeywordReqDto(RequestBody, BaseModel):
     posId: int
+
+
+class NoteReqDto(RequestBody, BaseModel):
+    name: str
+    keywords: List[KeywordReqDto]=[]
+    status: int
