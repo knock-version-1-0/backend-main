@@ -70,7 +70,7 @@ class NoteService(BaseService):
         status_code = None
         parse = lambda o: NoteReqDto(
             name=o['name'],
-            keywords=[KeywordReqDto(posId=k['posId']) for k in o['keywords']],
+            keywords=o.get('keywords', []),
             status=o['status']
         )
 
