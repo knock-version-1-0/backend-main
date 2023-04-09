@@ -31,3 +31,5 @@ jobs:
         cd src
         mkdir knock/logs
         pytest
+      env:
+        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
