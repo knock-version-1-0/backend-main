@@ -4,6 +4,20 @@
 
 ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
+## ERD
+
+[https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq](https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq)
+<a href="https://www.erdcloud.com/d/iwavjgkhiMCfbwSPq">
+    <img width="100%" alt="ERD" src="https://user-images.githubusercontent.com/82345753/230279648-be3b9384-d17a-46a7-95dc-aec7b259894c.png">
+</a>
+
+## API document
+
+[https://app.swaggerhub.com/apis-docs/jinhyeok15/knock_api/1.0.0#](https://app.swaggerhub.com/apis-docs/jinhyeok15/knock_api/1.0.0#)
+<a href="https://app.swaggerhub.com/apis-docs/jinhyeok15/knock_api/1.0.0#">
+    <img width="100%" alt="swagger" src="https://user-images.githubusercontent.com/82345753/230279427-95f81f89-b5bd-4897-998f-4bc64e3cad7d.png">
+</a>
+
 ## Description
 
 Knock main backend is concentrated on how to manage note application.
