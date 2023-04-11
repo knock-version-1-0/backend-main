@@ -38,4 +38,4 @@ Thanks to https://github.com/sdediego/django-clean-architecture, I can make a dr
 
     To process status of requirement, I use the domain exception. The domain exception name is the same as the Schema in the API Documentation.
 
-<img width="559" alt="image" src="https://user-images.githubusercontent.com/82345753/231099383-a80e29cf-1e2f-4e78-addf-8823531ba7b6.png">
+<img width="602" alt="image" src="https://user-images.githubusercontent.com/82345753/231249169-5972e874-8f4c-45aa-b89b-da6bb1c498cd.png">
