@@ -7,6 +7,7 @@ from pydantic import BaseModel, validator
 class KeywordEntity(BaseModel):
     noteId: int
     posId: int
+    text: str
 
 
 class NoteEntity(BaseModel):
