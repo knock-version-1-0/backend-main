@@ -58,6 +58,7 @@ def test_keyword_entity_consistency(note_entity_fixture):
     Keyword:
         noteId: integer
         posId: integer
+        text: string
     ```
     """
     keywords: List[KeywordEntity] = note_entity_fixture.keywords
@@ -65,6 +66,7 @@ def test_keyword_entity_consistency(note_entity_fixture):
     for keyword in keywords:
         assert isinstance(keyword.noteId, int)
         assert isinstance(keyword.posId, int)
+        assert isinstance(keyword.text, str)
 
 
 @pytest.mark.unit

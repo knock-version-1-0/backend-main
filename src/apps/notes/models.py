@@ -20,7 +20,8 @@ class NoteManager(models.Manager):
             try:
                 keywords = [Keyword.objects.create(
                     note=note,
-                    pos_id=k['posId']
+                    pos_id=k['posId'],
+                    text=k.get('text')
                 ) for k in keywords]
             except IntegrityError:
                 raise IntegrityError(Keyword.__name__)
@@ -54,6 +55,7 @@ class Note(TimestampedModel):
 class Keyword(models.Model):
     note = models.ForeignKey(Note, related_name='keywords', on_delete=models.CASCADE)
     pos_id = models.IntegerField()
+    text = models.CharField(max_length=12, null=True, blank=True)
 
     class Meta:
         db_table = 'notes_keyword'

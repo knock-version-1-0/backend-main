@@ -8,6 +8,7 @@ from core.utils.pydantic import RequestBody
 class KeywordDto(BaseModel):
     noteId: Optional[int]
     posId: int
+    text: str = ''
 
 
 class NoteDto(BaseModel):
@@ -21,6 +22,7 @@ class NoteDto(BaseModel):
 
 class KeywordReqDto(RequestBody, BaseModel):
     posId: int
+    text: str = ''
 
 
 class NoteReqDto(RequestBody, BaseModel):
