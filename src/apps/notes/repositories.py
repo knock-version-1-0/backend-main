@@ -31,7 +31,10 @@ class NoteRepository(NoteRepositoryInterface):
             displayId=note.display_id,
             authorId=note.author.pk,
             name=note.name,
-            keywords=[self.KeywordEntity(noteId=k.note.id, posId=k.pos_id) for k in note.keywords.all()],
+            keywords=[self.KeywordEntity(
+                noteId=k.note.id,
+                posId=k.pos_id,
+                text=k.text) for k in note.keywords.all()],
             status=note.status
         )
 
@@ -47,6 +50,9 @@ class NoteRepository(NoteRepositoryInterface):
                 displayId=note.display_id,
                 authorId=note.author.pk,
                 name=note.name,
-                keywords=[self.KeywordEntity(noteId=k.note.id, posId=k.pos_id) for k in note.keywords.all()],
+                keywords=[self.KeywordEntity(
+                    noteId=k.note.id,
+                    posId=k.pos_id,
+                    text=k.text) for k in note.keywords.all()],
                 status=note.status
             )

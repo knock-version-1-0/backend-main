@@ -54,7 +54,10 @@ class NoteUsecase(BaseUsecase):
             displayId=entity.displayId,
             authorId=entity.authorId,
             name=entity.name,
-            keywords=[self.KeywordDto(noteId=k.noteId, posId=k.posId) for k in entity.keywords],
+            keywords=[self.KeywordDto(
+                noteId=k.noteId,
+                posId=k.posId,
+                text=k.text) for k in entity.keywords],
             status=entity.status
         )
 
@@ -85,6 +88,9 @@ class NoteUsecase(BaseUsecase):
             displayId=entity.displayId,
             authorId=entity.authorId,
             name=entity.name,
-            keywords=[self.KeywordDto(noteId=k.noteId, posId=k.posId) for k in entity.keywords],
+            keywords=[self.KeywordDto(
+                noteId=k.noteId,
+                posId=k.posId,
+                text=k.text) for k in entity.keywords],
             status=entity.status
         )

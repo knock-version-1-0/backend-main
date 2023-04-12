@@ -43,7 +43,7 @@ def user_fixture() -> User:
 def note_request_dto_fixture() -> NoteReqDto:
     return NoteReqDto(
         name='note_request_dto_fixture',
-        keywords=[KeywordReqDto(posId=i) for i in range(10)],
+        keywords=[KeywordReqDto(posId=i, text=f'text{i}') for i in range(10)],
         status=StatusChoice.SAVE
     )
 
@@ -60,5 +60,6 @@ def note_usecase_context_fixture() -> dict:
 def keyword_entities_fixture() -> List[KeywordEntity]:
     return [KeywordEntity(
         noteId=1,
-        posId=i
+        posId=i,
+        text=f'text{i}'
     ) for i in range(10)]
