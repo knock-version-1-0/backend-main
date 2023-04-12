@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -8,6 +10,7 @@ from di.notes_factory import NoteFactory
 from adapters.dto.notes_dto import (
     NoteReqDto,
 )
+from django.contrib.auth import get_user_model
 
 
 def set_credential(client, token):
@@ -24,13 +27,13 @@ def test_GET_notes_detail(user_fixture, note_request_dto_fixture):
         note_request_dto_fixture,
         user_id=user_fixture.id
     )
-    url = reverse('notes-detail', args=[res_dto.name])
+    url = reverse('notes-detail', args=[res_dto.displayId])
     response = client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == res_dto.dict()
 
-    url = reverse('notes-detail', args=[res_dto.name+'name'])
+    url = reverse('notes-detail', args=[uuid.uuid4()])
     response = client.get(url)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -38,10 +41,18 @@ def test_GET_notes_detail(user_fixture, note_request_dto_fixture):
     user_fixture.is_active = False
     user_fixture.save()
 
-    url = reverse('notes-detail', args=[res_dto.name])
+    url = reverse('notes-detail', args=[res_dto.displayId])
     response = client.get(url)
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    user2 = get_user_model().objects.create_user('user2')
+    set_credential(client, token=user2.token)
+
+    url = reverse('notes-detail', args=[res_dto.displayId])
+    response = client.get(url)
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
@@ -55,7 +66,7 @@ def test_POST_notes_list(user_fixture, note_request_dto_fixture):
 
     assert response.status_code == status.HTTP_200_OK
     usecase = NoteFactory().usecase
-    res_dto = usecase.retrieve(req_dto.name, user_id=user_fixture.id)
+    res_dto = usecase.retrieve(response.data['displayId'], user_id=user_fixture.id)
     assert response.data == res_dto.dict()
 
     response = client.post(url, req_dto.dict(), format='json')

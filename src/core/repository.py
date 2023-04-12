@@ -1,7 +1,7 @@
 from typing import Optional
 
 from django.contrib.auth import get_user_model
-from domains.exceptions import UserInvalidError
+from core.exceptions import UserInvalidError, UserPermissionError
 
 
 class BaseRepository:
@@ -28,3 +28,8 @@ class BaseRepository:
             self.user = User.objects.filter(is_active=True).get(pk=user_id)
         except User.DoesNotExist:
             raise UserInvalidError()
+    
+    def check_permission(self):
+        instance = self.get_model_instance()
+        if not instance.is_available(self.user):
+            raise UserPermissionError()
