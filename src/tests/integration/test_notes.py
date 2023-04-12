@@ -6,7 +6,7 @@ from tests.fixtures import (
     user_fixture,
 )
 from core.repository import BaseRepository
-from domains.exceptions import (
+from core.exceptions import (
     AuthorizeNotCalledError,
     UserInvalidError,
     NoteDoesNotExistError,
@@ -150,8 +150,8 @@ def test_note_exists():
     repo.authorize(user.pk)
 
     with pytest.raises(NoteDoesNotExistError.error_type):
-        repo.find_by_name('note')
-    repo.find_by_name(note1.name)
+        repo.find_by_display_id(display_id=2)
+    repo.find_by_display_id(note1.display_id)
 
 
 @pytest.mark.django_db
@@ -174,5 +174,5 @@ def test_note_saved():
     repo.authorize(user.pk)
 
     with pytest.raises(NoteDoesNotExistError.error_type):
-        repo.find_by_name(note.name)
-    repo.find_by_name(note1.name)
+        repo.find_by_display_id(note.display_id)
+    repo.find_by_display_id(note1.display_id)

@@ -1,13 +1,23 @@
+import logging
+
 from .models import (
     Note,
     Keyword,
 )
+from django.db import IntegrityError
 
 from domains.interfaces.notes_repository import (
     NoteRepository as NoteRepositoryInterface
 )
-
+from core.exceptions import (
+    DatabaseError,
+    NoteDoesNotExistError,
+    NoteNameIntegrityError,
+    KeywordPosIdIntegrityError
+)
 from core.models import StatusChoice
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     'NoteRepository',
@@ -19,12 +29,22 @@ class NoteRepository(NoteRepositoryInterface):
         self.NoteEntity = context['NoteEntity']
         self.KeywordEntity = context['KeywordEntity']
 
-    def find_by_name(self, name):
-        note = Note.objects.prefetch_related('keywords').filter(
-            status=StatusChoice.SAVE
-        ).get(name=name, author=self.user)
+    def find_by_display_id(self, display_id: str):
+        try:
+            note = Note.objects.select_related('author')\
+                .prefetch_related('keywords')\
+                .filter(status=StatusChoice.SAVE)\
+                .get(display_id=display_id)
+
+        except Note.DoesNotExist:
+            raise NoteDoesNotExistError()
+
+        except Exception as e:
+            logger.debug(e)
+            raise DatabaseError(e)
 
         self.set_model_instance(note)
+        self.check_permission()
 
         return self.NoteEntity(
             id=note.pk,
@@ -41,10 +61,27 @@ class NoteRepository(NoteRepositoryInterface):
     def save(self, **kwargs):
         instance = self.get_model_instance()
 
+        # Check
+
         if bool(instance):
+            self.check_permission()
             instance.update(**kwargs)
         else:
-            note = Note.objects.create(author=self.user, **kwargs)
+            try:
+                note = Note.objects.create(author=self.user, **kwargs)
+
+            except IntegrityError as e:
+                if e.args[0] == Note.__name__:
+                    raise NoteNameIntegrityError()
+                elif e.args[0] == Keyword.__name__:
+                    raise KeywordPosIdIntegrityError()
+                else:
+                    raise DatabaseError(e)
+
+            except Exception as e:
+                logger.debug(e)
+                raise DatabaseError(e)
+
             return self.NoteEntity(
                 id=note.pk,
                 displayId=note.display_id,

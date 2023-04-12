@@ -2,7 +2,6 @@ from typing import List
 
 import pytest
 from unittest.mock import Mock
-from django.db.utils import IntegrityError
 
 from tests.fixtures import (
     note_entity_fixture,
@@ -17,7 +16,7 @@ from domains.entities.notes_entity import (
 from domains.usecases.notes_usecase import (
     NoteUsecase,
 )
-from domains.exceptions import (
+from core.exceptions import (
     NoteNameIntegrityError,
     KeywordPosIdIntegrityError,
 )
@@ -78,7 +77,7 @@ def test_note_name_duplicate(note_request_dto_fixture, note_usecase_context_fixt
     - usecase.create 호출 시 IntegrityError에 대해 NoteNameIntegrityError를 raise합니다.
     """
     repository = Mock()
-    repository.save.side_effect = IntegrityError('Note')
+    repository.save.side_effect = NoteNameIntegrityError()
     usecase = NoteUsecase(
         repository,
         note_usecase_context_fixture
@@ -96,7 +95,7 @@ def test_keyword_pos_id_duplicate(note_request_dto_fixture, note_usecase_context
     - usecase.create 호출 시 IntegrityError에 대해 NoteNameIntegrityError를 raise합니다.
     """
     repository = Mock()
-    repository.save.side_effect = IntegrityError('Keyword')
+    repository.save.side_effect = KeywordPosIdIntegrityError()
     usecase = NoteUsecase(
         repository,
         note_usecase_context_fixture

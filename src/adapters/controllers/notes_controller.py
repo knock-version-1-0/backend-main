@@ -20,8 +20,8 @@ class NoteController(BaseController):
         self.service = service
     
     def retrieve(self, request: HttpRequest, key: str) -> Response:
-        name = key
-        payload, status = self.service.retrieve(key=name, user_id=request.user.pk)
+        display_id = key
+        payload, status = self.service.retrieve(key=display_id, user_id=request.user.pk)
         if isinstance(payload, NoteDto):
             return Response(payload.dict(), status=status)
         return Response(payload, status=status)

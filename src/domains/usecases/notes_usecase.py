@@ -6,17 +6,11 @@ from core.usecase import BaseUsecase
 from domains.interfaces.notes_repository import (
     NoteRepository
 )
-from domains.exceptions import (
+from core.exceptions import (
     NoteNameIntegrityError,
     NoteDoesNotExistError,
     AuthorizeNotCalledError,
     KeywordPosIdIntegrityError,
-    IntegrityError,
-    DatabaseError
-)
-from domains.entities.notes_entity import (
-    NoteEntity,
-    KeywordEntity,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,18 +30,14 @@ class NoteUsecase(BaseUsecase):
     @authorize_required
     def retrieve(self, key: str, user_id: int):
         try:
-            entity = self.repository.find_by_name(name=key)
+            entity = self.repository.find_by_display_id(display_id=key)
 
-        except AuthorizeNotCalledError.error_type:
+        except AuthorizeNotCalledError as e:
             logger.error(AuthorizeNotCalledError.message)
-            raise AuthorizeNotCalledError()
+            raise e
 
-        except NoteDoesNotExistError.error_type:
-            raise NoteDoesNotExistError()
-        
-        except Exception as e:
-            logger.debug(e)
-            raise DatabaseError()
+        except NoteDoesNotExistError as e:
+            raise e
 
         return self.NoteDto(
             id=entity.id,
@@ -70,18 +60,14 @@ class NoteUsecase(BaseUsecase):
                 keywords=[k.dict() for k in req_body.keywords]
             )
 
-        except AuthorizeNotCalledError.error_type:
-            raise AuthorizeNotCalledError()
-
-        except IntegrityError as e:
-            if e.args[0] == NoteEntity.__name__.replace('Entity', ''):
-                raise NoteNameIntegrityError()
-            if e.args[0] == KeywordEntity.__name__.replace('Entity', ''):
-                raise KeywordPosIdIntegrityError()
+        except AuthorizeNotCalledError as e:
+            raise e
         
-        except Exception as e:
-            logger.debug(e)
-            raise DatabaseError()
+        except NoteNameIntegrityError as e:
+            raise e
+        
+        except KeywordPosIdIntegrityError as e:
+            raise e
 
         return self.NoteDto(
             id=entity.id,

@@ -15,10 +15,10 @@ class NoteListViewSet(viewsets.ViewSet):
 
 class NoteDetailViewset(viewsets.ViewSet):
     controller = None
-    lookup_field = 'name'
+    lookup_field = 'display_id'
 
-    def retrieve(self, request: HttpRequest, name: str) -> Response:
+    def retrieve(self, request: HttpRequest, display_id: str) -> Response:
         return self.controller.retrieve(
             request=request,
-            key=name
+            key=display_id
         )

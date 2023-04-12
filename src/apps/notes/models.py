@@ -14,6 +14,7 @@ class NoteManager(models.Manager):
                     author=author,
                     **kwargs
                 )
+
             except IntegrityError:
                 raise IntegrityError(Note.__name__)
             
@@ -23,6 +24,7 @@ class NoteManager(models.Manager):
                     pos_id=k['posId'],
                     text=k.get('text')
                 ) for k in keywords]
+
             except IntegrityError:
                 raise IntegrityError(Keyword.__name__)
 
@@ -50,6 +52,11 @@ class Note(TimestampedModel):
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.save(update_fields=kwargs.keys())
+    
+    def is_available(self, user):
+        if user.pk != self.author.pk:
+            return False
+        return True
 
 
 class Keyword(models.Model):

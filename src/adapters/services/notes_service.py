@@ -14,13 +14,14 @@ from adapters.dto.notes_dto import (
 from domains.usecases.notes_usecase import (
     NoteUsecase
 )
-from domains.exceptions import (
+from core.exceptions import (
     NoteDoesNotExistError,
     NoteNameIntegrityError,
     AuthorizeNotCalledError,
     UserInvalidError,
     KeywordPosIdIntegrityError,
     DatabaseError,
+    UserPermissionError
 )
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,10 @@ class NoteService(BaseService):
         
         except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+
+        except UserPermissionError as e:
+            status_code = status.HTTP_403_FORBIDDEN
             return error_wrapper(e, status_code)
         
         except DatabaseError as e:
@@ -92,6 +97,10 @@ class NoteService(BaseService):
         
         except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except UserPermissionError as e:
+            status_code = status.HTTP_403_FORBIDDEN
             return error_wrapper(e, status_code)
         
         except DatabaseError as e:
