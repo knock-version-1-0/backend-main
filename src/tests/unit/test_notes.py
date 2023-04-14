@@ -4,7 +4,6 @@ from typing import List
 
 import pytest
 from unittest.mock import Mock
-from django.db.models import QuerySet
 
 from tests.fixtures import (
     note_entity_fixture,

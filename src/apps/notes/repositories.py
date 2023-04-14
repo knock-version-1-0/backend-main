@@ -1,5 +1,3 @@
-import logging
-
 from .models import (
     Note,
     Keyword,
@@ -18,8 +16,6 @@ from core.exceptions import (
 )
 from core.models import StatusChoice
 from domains.constants import MAX_NOTE_LIST_LIMIT
-
-logger = logging.getLogger(__name__)
 
 __all__ = [
     'NoteRepository',
@@ -49,7 +45,6 @@ class NoteRepository(NoteRepositoryInterface):
                     )[offset:offset+limit]
         
         except Exception as e:
-            logger.debug(e)
             raise DatabaseError(e)
 
         return [self.NoteSummaryEntity(
@@ -65,7 +60,6 @@ class NoteRepository(NoteRepositoryInterface):
             raise NoteDoesNotExistError()
 
         except Exception as e:
-            logger.debug(e)
             raise DatabaseError(e)
 
         self.set_model_instance(note)
@@ -121,7 +115,6 @@ class NoteRepository(NoteRepositoryInterface):
                 raise e
 
             except Exception as e:
-                logger.debug(e)
                 raise DatabaseError(e)
 
             return self.NoteEntity(

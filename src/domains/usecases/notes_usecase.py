@@ -1,11 +1,13 @@
 import logging
-from core.utils.decorators import authorize_required
+from typing import Optional
 
+from core.utils.decorators import authorize_required
 from core.usecase import BaseUsecase
 
 from domains.interfaces.notes_repository import (
     NoteRepository
 )
+from domains.constants import MAX_NOTE_LIST_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +25,13 @@ class NoteUsecase(BaseUsecase):
         self.NoteSummaryDto = context['NoteSummaryDto']
 
     @authorize_required
-    def list(self, lookup: dict={}):
-        entities = self.repository.find_by_author(lookup=lookup)
+    def list(self, params=None, user_id: Optional[int]=None):
+        params = params or {}
+        entities = self.repository.find_by_author(lookup={
+            'name': params.get('name', ''),
+            'offset': int(params.get('offset', 0)),
+            'limit': int(params.get('limit', MAX_NOTE_LIST_LIMIT))
+        })
         
         return [self.NoteSummaryDto(**entity.dict()) for entity in entities]
 

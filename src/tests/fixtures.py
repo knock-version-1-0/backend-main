@@ -1,5 +1,5 @@
 from typing import List
-import random, uuid
+import uuid
 
 import pytest
 
