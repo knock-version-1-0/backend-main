@@ -29,30 +29,27 @@ def test_GET_notes_detail(user_fixture, note_request_dto_fixture):
     )
     url = reverse('notes-detail', args=[res_dto.displayId])
     response = client.get(url)
-
     assert response.status_code == status.HTTP_200_OK
     assert response.data == res_dto.dict()
 
     url = reverse('notes-detail', args=[uuid.uuid4()])
     response = client.get(url)
-
     assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.data['type'] == 'NoteDoesNotExistError'
 
     user_fixture.is_active = False
     user_fixture.save()
-
     url = reverse('notes-detail', args=[res_dto.displayId])
     response = client.get(url)
-
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.data['type'] == 'UserInvalidError'
 
     user2 = get_user_model().objects.create_user('user2')
     set_credential(client, token=user2.token)
-
     url = reverse('notes-detail', args=[res_dto.displayId])
     response = client.get(url)
-
     assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.data['type'] == 'UserPermissionError'
 
 
 @pytest.mark.django_db

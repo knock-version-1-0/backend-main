@@ -5,13 +5,15 @@ import pytest
 
 from domains.entities.notes_entity import (
     NoteEntity,
-    KeywordEntity
+    KeywordEntity,
+    NoteSummaryEntity
 )
 from adapters.dto.notes_dto import (
     NoteReqDto,
     KeywordReqDto,
     NoteDto,
     KeywordDto,
+    NoteSummaryDto
 )
 from core.models import StatusChoice
 from apps.users.models import User
@@ -52,7 +54,8 @@ def note_request_dto_fixture() -> NoteReqDto:
 def note_usecase_context_fixture() -> dict:
     return {
         'NoteDto': NoteDto,
-        'KeywordDto': KeywordDto
+        'KeywordDto': KeywordDto,
+        'NoteSummaryDto': NoteSummaryDto
     }
 
 
@@ -63,3 +66,11 @@ def keyword_entities_fixture() -> List[KeywordEntity]:
         posId=i,
         text=f'text{i}'
     ) for i in range(10)]
+
+
+@pytest.fixture
+def note_summary_entity_fixture() -> NoteSummaryEntity:
+    return NoteSummaryEntity(
+        displayId=uuid.uuid4(),
+        name='note1'
+    )

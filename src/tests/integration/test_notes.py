@@ -7,7 +7,6 @@ from tests.fixtures import (
 )
 from core.repository import BaseRepository
 from core.exceptions import (
-    AuthorizeNotCalledError,
     UserInvalidError,
     NoteDoesNotExistError,
 )
@@ -27,11 +26,10 @@ def test_is_user_authorized():
     user = mixer.blend('users.User')
 
     repo = BaseRepository()
-    with pytest.raises(AuthorizeNotCalledError.error_type):
-        repo.user
+    assert repo.user == None
 
     repo.authorize(user.pk)
-    repo.user
+    assert bool(repo.user)
 
 
 @pytest.mark.django_db
@@ -52,7 +50,7 @@ def test_repository_authorize(user_fixture):
         repo.authorize(2)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_note_name_integrity():
     """
     UniqueConstraint -> posId, note
@@ -60,7 +58,6 @@ def test_note_name_integrity():
     user = mixer.blend('users.User')
     Note.objects.create(
         author=user,
-        keywords=[],
         status=StatusChoice.SAVE,
         name='note1'
     )
@@ -68,14 +65,12 @@ def test_note_name_integrity():
     with pytest.raises(IntegrityError):
         Note.objects.create(
             author=user,
-            keywords=[],
             status=StatusChoice.SAVE,
             name='note1'
         )
     
     Note.objects.create(
         author=user,
-        keywords=[],
         status=StatusChoice.SAVE,
         name='note2'
     )
@@ -83,7 +78,6 @@ def test_note_name_integrity():
     user = mixer.blend('users.User')
     Note.objects.create(
         author=user,
-        keywords=[],
         status=StatusChoice.SAVE,
         name='note2'
     )
@@ -97,7 +91,6 @@ def test_keyword_pos_id_integrity():
     user = mixer.blend('users.User')
     note = Note.objects.create(
         author=user,
-        keywords=[],
         status=StatusChoice.SAVE,
         name='note1'
     )
@@ -108,7 +101,6 @@ def test_keyword_pos_id_integrity():
 
     note = Note.objects.create(
         author=user,
-        keywords=[],
         status=StatusChoice.SAVE,
         name='note2'
     )
@@ -149,15 +141,15 @@ def test_note_exists():
     repo = factory.repository
     repo.authorize(user.pk)
 
-    with pytest.raises(NoteDoesNotExistError.error_type):
-        repo.find_by_display_id(display_id=2)
-    repo.find_by_display_id(note1.display_id)
+    with pytest.raises(NoteDoesNotExistError):
+        repo.find_one(display_id=2)
+    repo.find_one(note1.display_id)
 
 
 @pytest.mark.django_db
 def test_note_saved():
     """
-    Note.status = SAVE일 때만 조회할 수 있습니다.
+    Note.status = SAVE일 때만 User가 조회할 수 있습니다.
     """
     user = mixer.blend('users.User')
     note = mixer.blend('notes.Note',
@@ -173,6 +165,55 @@ def test_note_saved():
     repo = factory.repository
     repo.authorize(user.pk)
 
-    with pytest.raises(NoteDoesNotExistError.error_type):
-        repo.find_by_display_id(note.display_id)
-    repo.find_by_display_id(note1.display_id)
+    with pytest.raises(NoteDoesNotExistError):
+        repo.find_one(note.display_id)
+    repo.find_one(note1.display_id)
+
+    assert len(repo.find_by_author()) == 1
+
+
+@pytest.mark.django_db
+def test_find_by_author():
+    """
+    Author의 Note만 list를 조회할 수 있습니다.
+    """
+    author = mixer.blend('users.User')
+    other = mixer.blend('users.User')
+
+    note = mixer.blend('notes.Note',
+                        author=author,
+                        name='note',
+                        status=StatusChoice.SAVE)
+    note1 = mixer.blend('notes.Note',
+                       author=other,
+                       name='note1',
+                       status=StatusChoice.SAVE)
+
+    repository = NoteFactory().repository
+    repository.authorize(author.id)
+
+    result = repository.find_by_author()
+    assert len(result) == 1
+    assert result[0].name == note.name
+
+
+@pytest.mark.django_db
+def test_filter_name_like():
+    """
+    Note list는 name별로 search 가능합니다.
+    """
+    size = 5
+    author = mixer.blend('users.User')
+    notes = [Note.objects.create(
+        author=author,
+        name=f'name{i}note',
+        status=StatusChoice.SAVE
+    ) for i in range(size)]
+    assert len(Note.objects.filter(name__contains='')) == size
+    assert len(Note.objects.filter(name__contains='1')) == 1
+
+    repository = NoteFactory().repository
+    repository.authorize(author.id)
+
+    assert len(repository.find_by_author({'name': 'name'})) == size
+    assert len(repository.find_by_author({'name': '0'})) == 1

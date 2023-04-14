@@ -5,6 +5,7 @@ from .models import (
     Keyword,
 )
 from django.db import IntegrityError
+from django.db import transaction
 
 from domains.interfaces.notes_repository import (
     NoteRepository as NoteRepositoryInterface
@@ -16,6 +17,7 @@ from core.exceptions import (
     KeywordPosIdIntegrityError
 )
 from core.models import StatusChoice
+from domains.constants import MAX_NOTE_LIST_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +27,39 @@ __all__ = [
 
 
 class NoteRepository(NoteRepositoryInterface):
+    queryset = Note.objects\
+        .select_related('author')\
+        .prefetch_related('keywords')\
+        .filter(status=StatusChoice.SAVE)
+    
     def __init__(self, context: dict):
         self.NoteEntity = context['NoteEntity']
         self.KeywordEntity = context['KeywordEntity']
-
-    def find_by_display_id(self, display_id: str):
+        self.NoteSummaryEntity = context['NoteSummaryEntity']
+    
+    def find_by_author(self, lookup={}):
         try:
-            note = Note.objects.select_related('author')\
-                .prefetch_related('keywords')\
-                .filter(status=StatusChoice.SAVE)\
-                .get(display_id=display_id)
+            offset, limit = lookup.get('offset', 0), lookup.get('limit', MAX_NOTE_LIST_LIMIT)
+            if limit > MAX_NOTE_LIST_LIMIT:
+                limit = MAX_NOTE_LIST_LIMIT
+
+            notes = self.queryset.filter(
+                        author=self.user,
+                        name__contains=lookup.get('name', '')
+                    )[offset:offset+limit]
+        
+        except Exception as e:
+            logger.debug(e)
+            raise DatabaseError(e)
+
+        return [self.NoteSummaryEntity(
+            displayId=note.display_id,
+            name=note.name
+        ) for note in notes]
+
+    def find_one(self, display_id: str):
+        try:
+            note = self.queryset.get(display_id=display_id)
 
         except Note.DoesNotExist:
             raise NoteDoesNotExistError()
@@ -68,15 +93,32 @@ class NoteRepository(NoteRepositoryInterface):
             instance.update(**kwargs)
         else:
             try:
-                note = Note.objects.create(author=self.user, **kwargs)
+                with transaction.atomic():
+                    keywords = kwargs.pop('keywords')
+                    try:
+                        note = self.queryset.create(
+                            author=self.user,
+                            **kwargs
+                        )
 
-            except IntegrityError as e:
-                if e.args[0] == Note.__name__:
-                    raise NoteNameIntegrityError()
-                elif e.args[0] == Keyword.__name__:
-                    raise KeywordPosIdIntegrityError()
-                else:
-                    raise DatabaseError(e)
+                    except IntegrityError:
+                        raise NoteNameIntegrityError()
+                    
+                    try:
+                        keywords = [Keyword.objects.create(
+                            note=note,
+                            pos_id=k['posId'],
+                            text=k.get('text')
+                        ) for k in keywords]
+
+                    except IntegrityError:
+                        raise KeywordPosIdIntegrityError()
+
+            except NoteNameIntegrityError as e:
+                raise e
+            
+            except KeywordPosIdIntegrityError as e:
+                raise e
 
             except Exception as e:
                 logger.debug(e)
@@ -90,6 +132,6 @@ class NoteRepository(NoteRepositoryInterface):
                 keywords=[self.KeywordEntity(
                     noteId=k.note.id,
                     posId=k.pos_id,
-                    text=k.text) for k in note.keywords.all()],
+                    text=k.text) for k in keywords],
                 status=note.status
             )

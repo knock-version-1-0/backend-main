@@ -6,12 +6,6 @@ from core.usecase import BaseUsecase
 from domains.interfaces.notes_repository import (
     NoteRepository
 )
-from core.exceptions import (
-    NoteNameIntegrityError,
-    NoteDoesNotExistError,
-    AuthorizeNotCalledError,
-    KeywordPosIdIntegrityError,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -26,18 +20,17 @@ class NoteUsecase(BaseUsecase):
         self.repository = repository
         self.NoteDto = context['NoteDto']
         self.KeywordDto = context['KeywordDto']
+        self.NoteSummaryDto = context['NoteSummaryDto']
+
+    @authorize_required
+    def list(self, lookup: dict={}):
+        entities = self.repository.find_by_author(lookup=lookup)
+        
+        return [self.NoteSummaryDto(**entity.dict()) for entity in entities]
 
     @authorize_required
     def retrieve(self, key: str, user_id: int):
-        try:
-            entity = self.repository.find_by_display_id(display_id=key)
-
-        except AuthorizeNotCalledError as e:
-            logger.error(AuthorizeNotCalledError.message)
-            raise e
-
-        except NoteDoesNotExistError as e:
-            raise e
+        entity = self.repository.find_one(display_id=key)
 
         return self.NoteDto(
             id=entity.id,
@@ -53,21 +46,11 @@ class NoteUsecase(BaseUsecase):
 
     @authorize_required
     def create(self, req_body, user_id: int):
-        try:
-            entity = self.repository.save(
-                name=req_body.name,
-                status=req_body.status,
-                keywords=[k.dict() for k in req_body.keywords]
-            )
-
-        except AuthorizeNotCalledError as e:
-            raise e
-        
-        except NoteNameIntegrityError as e:
-            raise e
-        
-        except KeywordPosIdIntegrityError as e:
-            raise e
+        entity = self.repository.save(
+            name=req_body.name,
+            status=req_body.status,
+            keywords=[k.dict() for k in req_body.keywords]
+        )
 
         return self.NoteDto(
             id=entity.id,

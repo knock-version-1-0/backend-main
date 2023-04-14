@@ -17,7 +17,6 @@ from domains.usecases.notes_usecase import (
 from core.exceptions import (
     NoteDoesNotExistError,
     NoteNameIntegrityError,
-    AuthorizeNotCalledError,
     UserInvalidError,
     KeywordPosIdIntegrityError,
     DatabaseError,
@@ -46,10 +45,6 @@ class NoteService(BaseService):
 
         except NoteDoesNotExistError as e:
             status_code = status.HTTP_404_NOT_FOUND
-            return error_wrapper(e, status_code)
-
-        except AuthorizeNotCalledError as e:
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
         except UserInvalidError as e:
@@ -89,10 +84,6 @@ class NoteService(BaseService):
         
         except KeywordPosIdIntegrityError as e:
             status_code = status.HTTP_400_BAD_REQUEST
-            return error_wrapper(e, status_code)
-        
-        except AuthorizeNotCalledError as e:
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
         except UserInvalidError as e:

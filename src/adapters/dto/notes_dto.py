@@ -29,3 +29,8 @@ class NoteReqDto(RequestBody, BaseModel):
     name: str
     keywords: List[KeywordReqDto]=[]
     status: int
+
+
+class NoteSummaryDto(BaseModel):
+    displayId: str
+    name: str
