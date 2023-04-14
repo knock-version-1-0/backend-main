@@ -1,34 +1,8 @@
 import uuid
 
-from django.db import models, transaction
-from django.db.utils import IntegrityError
+from django.db import models
 
 from core.models import TimestampedModel, StatusField
-
-
-class NoteManager(models.Manager):
-    def create(self, author, keywords, **kwargs):
-        with transaction.atomic():
-            try:
-                note = super().create(
-                    author=author,
-                    **kwargs
-                )
-
-            except IntegrityError:
-                raise IntegrityError(Note.__name__)
-            
-            try:
-                keywords = [Keyword.objects.create(
-                    note=note,
-                    pos_id=k['posId'],
-                    text=k.get('text')
-                ) for k in keywords]
-
-            except IntegrityError:
-                raise IntegrityError(Keyword.__name__)
-
-        return note
 
 
 class Note(TimestampedModel):
@@ -36,8 +10,6 @@ class Note(TimestampedModel):
     display_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=25)
     status = StatusField
-
-    objects = NoteManager()
 
     class Meta:
         db_table = 'notes_note'

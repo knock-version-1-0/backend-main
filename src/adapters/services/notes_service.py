@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 from core.utils.typing import StatusCode, Code
 
 from django.http.request import QueryDict
@@ -10,6 +10,7 @@ from adapters.dto.notes_dto import (
     NoteDto,
     NoteReqDto,
     KeywordReqDto,
+    NoteSummaryDto
 )
 from domains.usecases.notes_usecase import (
     NoteUsecase
@@ -17,7 +18,6 @@ from domains.usecases.notes_usecase import (
 from core.exceptions import (
     NoteDoesNotExistError,
     NoteNameIntegrityError,
-    AuthorizeNotCalledError,
     UserInvalidError,
     KeywordPosIdIntegrityError,
     DatabaseError,
@@ -36,6 +36,29 @@ class NoteService(BaseService):
     def __init__(self, usecase: NoteUsecase):
         self.usecase = usecase
     
+    def list(self, params=None, user_id: Optional[int]=None) -> Tuple[Union[NoteSummaryDto, Code], StatusCode]:
+        status_code = None
+
+        try:
+            status_code = status.HTTP_200_OK
+            obj = self.usecase.list(params, user_id=user_id)
+        
+        except UserInvalidError as e:
+            status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except DatabaseError as e:
+            logger.debug(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+
+        except Exception as e:
+            logger.info(e)
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+
+        return (obj, status_code)
+    
     def retrieve(self, key: str, user_id: int) -> Tuple[Union[NoteDto, Code], StatusCode]:
         name = key
         status_code = None
@@ -47,10 +70,6 @@ class NoteService(BaseService):
         except NoteDoesNotExistError as e:
             status_code = status.HTTP_404_NOT_FOUND
             return error_wrapper(e, status_code)
-
-        except AuthorizeNotCalledError as e:
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return error_wrapper(e, status_code)
         
         except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
@@ -61,6 +80,7 @@ class NoteService(BaseService):
             return error_wrapper(e, status_code)
         
         except DatabaseError as e:
+            logger.debug(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
@@ -91,10 +111,6 @@ class NoteService(BaseService):
             status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
         
-        except AuthorizeNotCalledError as e:
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return error_wrapper(e, status_code)
-        
         except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
             return error_wrapper(e, status_code)
@@ -104,6 +120,7 @@ class NoteService(BaseService):
             return error_wrapper(e, status_code)
         
         except DatabaseError as e:
+            logger.debug(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         

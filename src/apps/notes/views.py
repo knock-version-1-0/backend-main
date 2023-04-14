@@ -11,6 +11,11 @@ class NoteListViewSet(viewsets.ViewSet):
         return self.controller.create(
             request=request
         )
+    
+    def list(self, request: HttpRequest) -> Response:
+        return self.controller.list(
+            request=request
+        )
 
 
 class NoteDetailViewset(viewsets.ViewSet):

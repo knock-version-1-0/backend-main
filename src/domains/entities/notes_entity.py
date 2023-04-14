@@ -23,3 +23,14 @@ class NoteEntity(BaseModel):
         if isinstance(v, uuid.UUID):
             return str(v)
         return v
+
+
+class NoteSummaryEntity(BaseModel):
+    displayId: str
+    name: str
+
+    @validator('displayId', pre=True)
+    def uuid_to_str(cls, v):
+        if isinstance(v, uuid.UUID):
+            return str(v)
+        return v

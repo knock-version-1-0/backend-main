@@ -4,7 +4,7 @@ from django.http.request import QueryDict
 
 
 class CRUDMixin:
-    def list(self, query_param: Optional[QueryDict]=None, **variables):
+    def list(self, params: Optional[QueryDict]=None, **variables):
         raise NotImplementedError()
 
     def retrieve(self, key: object, **variables) -> Any:
