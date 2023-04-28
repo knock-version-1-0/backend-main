@@ -76,6 +76,7 @@ def test_keyword_entity_consistency(note_entity_fixture):
     keywords: List[KeywordEntity] = note_entity_fixture.keywords
 
     for keyword in keywords:
+        assert isinstance(keyword.id, int)
         assert isinstance(keyword.noteId, int)
         assert isinstance(keyword.posX, int)
         assert isinstance(keyword.posY, int)

@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError, DatabaseError as _DatabaseError
+from django.db.utils import IntegrityError
 
 
 class NoteDoesNotExistError(ObjectDoesNotExist):
@@ -14,10 +14,3 @@ class NoteNameIntegrityError(IntegrityError):
     error_type = IntegrityError
     def __init__(self, *args):
         super().__init__(self.message, *args)
-
-
-# class KeywordPosIdIntegrityError(IntegrityError):
-#     message = "동일한 Keyword 내에서 posId는 중복될 수 없습니다."
-#     error_type = IntegrityError
-#     def __init__(self, *args):
-#         super().__init__(self.message, *args)

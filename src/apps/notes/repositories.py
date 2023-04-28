@@ -70,6 +70,7 @@ class NoteRepository(NoteRepositoryInterface):
             authorId=note.author.pk,
             name=note.name,
             keywords=[self.KeywordEntity(
+                id=k.pk,
                 noteId=note.pk,
                 posX=k.pos_x,
                 posY=k.pos_y,
