@@ -12,7 +12,6 @@ from core.exceptions import (
     DatabaseError,
     NoteDoesNotExistError,
     NoteNameIntegrityError,
-    KeywordPosIdIntegrityError
 )
 from core.models import StatusChoice
 from domains.constants import MAX_NOTE_LIST_LIMIT
@@ -25,7 +24,7 @@ __all__ = [
 class NoteRepository(NoteRepositoryInterface):
     queryset = Note.objects\
         .select_related('author')\
-        .prefetch_related('keywords')\
+        .prefetch_related('keywords__parent')\
         .filter(status=StatusChoice.SAVE)
     
     def __init__(self, context: dict):
@@ -71,9 +70,13 @@ class NoteRepository(NoteRepositoryInterface):
             authorId=note.author.pk,
             name=note.name,
             keywords=[self.KeywordEntity(
-                noteId=k.note.id,
-                posId=k.pos_id,
-                text=k.text) for k in note.keywords.all()],
+                noteId=note.pk,
+                posX=k.pos_x,
+                posY=k.pos_y,
+                text=k.text,
+                parentId=k.parent.pk if k.parent is not None else k.parent,
+                status=k.status,
+                timestamp=k.timestamp) for k in note.keywords.all()],
             status=note.status
         )
 
@@ -88,7 +91,6 @@ class NoteRepository(NoteRepositoryInterface):
         else:
             try:
                 with transaction.atomic():
-                    keywords = kwargs.pop('keywords')
                     try:
                         note = self.queryset.create(
                             author=self.user,
@@ -97,21 +99,8 @@ class NoteRepository(NoteRepositoryInterface):
 
                     except IntegrityError:
                         raise NoteNameIntegrityError()
-                    
-                    try:
-                        keywords = [Keyword.objects.create(
-                            note=note,
-                            pos_id=k['posId'],
-                            text=k.get('text')
-                        ) for k in keywords]
-
-                    except IntegrityError:
-                        raise KeywordPosIdIntegrityError()
 
             except NoteNameIntegrityError as e:
-                raise e
-            
-            except KeywordPosIdIntegrityError as e:
                 raise e
 
             except Exception as e:
@@ -122,9 +111,5 @@ class NoteRepository(NoteRepositoryInterface):
                 displayId=note.display_id,
                 authorId=note.author.pk,
                 name=note.name,
-                keywords=[self.KeywordEntity(
-                    noteId=k.note.id,
-                    posId=k.pos_id,
-                    text=k.text) for k in keywords],
                 status=note.status
             )

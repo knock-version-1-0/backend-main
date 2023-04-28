@@ -1,13 +1,25 @@
-from typing import List
+from enum import Enum
+from typing import List, Optional
 import uuid
 
 from pydantic import BaseModel, validator
 
 
+class KeywordStatus(Enum):
+    UNSELECT = 1
+    READ = 2
+    EDIT = 3
+
+
 class KeywordEntity(BaseModel):
+    id: int
     noteId: int
-    posId: int
+    posX: int
+    posY: int
     text: str
+    parentId: Optional[int] = None
+    status: int
+    timestamp: int
 
 
 class NoteEntity(BaseModel):

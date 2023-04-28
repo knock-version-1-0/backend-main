@@ -7,11 +7,6 @@ from domains.entities.notes_entity import (
     NoteSummaryEntity,
 )
 from domains.usecases.notes_usecase import NoteUsecase
-from adapters.dto.notes_dto import (
-    NoteDto,
-    KeywordDto,
-    NoteSummaryDto,
-)
 from adapters.services.notes_service import (
     NoteService,
 )
@@ -33,11 +28,7 @@ class NoteFactory(BaseFactory):
     @property
     def usecase(self) -> NoteUsecase:
         return NoteUsecase(
-            self.repository, {
-            'NoteDto': NoteDto,
-            'KeywordDto': KeywordDto,
-            'NoteSummaryDto': NoteSummaryDto
-        })
+            self.repository)
 
     @property
     def service(self) -> NoteService:

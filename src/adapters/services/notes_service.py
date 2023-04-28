@@ -1,16 +1,14 @@
 import logging
-from typing import Tuple, Union, Optional
-from core.utils.typing import StatusCode, Code
+from typing import Tuple, Optional
+from core.utils.typing import StatusCode
 
 from django.http.request import QueryDict
 from rest_framework import status
 from core.service import BaseService, error_wrapper
 
 from adapters.dto.notes_dto import (
-    NoteDto,
     NoteReqDto,
     KeywordReqDto,
-    NoteSummaryDto
 )
 from domains.usecases.notes_usecase import (
     NoteUsecase
@@ -19,7 +17,6 @@ from core.exceptions import (
     NoteDoesNotExistError,
     NoteNameIntegrityError,
     UserInvalidError,
-    KeywordPosIdIntegrityError,
     DatabaseError,
     UserPermissionError
 )
@@ -36,7 +33,7 @@ class NoteService(BaseService):
     def __init__(self, usecase: NoteUsecase):
         self.usecase = usecase
     
-    def list(self, params=None, user_id: Optional[int]=None) -> Tuple[Union[NoteSummaryDto, Code], StatusCode]:
+    def list(self, params=None, user_id: Optional[int]=None) -> Tuple[dict, StatusCode]:
         status_code = None
 
         try:
@@ -59,7 +56,7 @@ class NoteService(BaseService):
 
         return (obj, status_code)
     
-    def retrieve(self, key: str, user_id: int) -> Tuple[Union[NoteDto, Code], StatusCode]:
+    def retrieve(self, key: str, user_id: int) -> Tuple[dict, StatusCode]:
         name = key
         status_code = None
 
@@ -91,11 +88,10 @@ class NoteService(BaseService):
 
         return (obj, status_code)
 
-    def create(self, req_body: QueryDict, user_id: int) -> Tuple[Union[NoteDto, Code], StatusCode]:
+    def create(self, req_body: QueryDict, user_id: int) -> Tuple[dict, StatusCode]:
         status_code = None
         parse = lambda o: NoteReqDto(
             name=o['name'],
-            keywords=o.get('keywords', []),
             status=o['status']
         )
 
@@ -104,10 +100,6 @@ class NoteService(BaseService):
             obj = self.usecase.create(req_body=parse(req_body), user_id=user_id)
         
         except NoteNameIntegrityError as e:
-            status_code = status.HTTP_400_BAD_REQUEST
-            return error_wrapper(e, status_code)
-        
-        except KeywordPosIdIntegrityError as e:
             status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
         
