@@ -83,49 +83,6 @@ def test_note_name_integrity():
     )
 
 
-@pytest.mark.django_db(transaction=True)
-def test_keyword_pos_id_integrity():
-    """
-    UniqueConstraint -> author, name
-    """
-    user = mixer.blend('users.User')
-    note = Note.objects.create(
-        author=user,
-        status=StatusChoice.SAVE,
-        name='note1'
-    )
-
-    with pytest.raises(IntegrityError):
-        for _ in range(4):
-            Keyword.objects.create(note=note, pos_id=1)
-
-    note = Note.objects.create(
-        author=user,
-        status=StatusChoice.SAVE,
-        name='note2'
-    )
-    for i in range(4):
-        Keyword.objects.create(note=note, pos_id=i)
-
-
-@pytest.mark.django_db
-def test_keyword_order_by():
-    """
-    Keyword는 Keyword.posId 별로 정렬됩니다.
-    """
-    note = mixer.blend('notes.Note')
-
-    for i in range(9, -1, -1):
-        Keyword.objects.create(
-            note=note,
-            pos_id=i
-        )
-    
-    keywords = Keyword.objects.filter(note=note)
-    for i in range(10):
-        assert keywords[i].pos_id == i
-
-
 @pytest.mark.django_db
 def test_note_exists():
     """

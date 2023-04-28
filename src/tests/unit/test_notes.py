@@ -8,7 +8,6 @@ from unittest.mock import Mock
 from tests.fixtures import (
     note_entity_fixture,
     note_request_dto_fixture,
-    note_usecase_context_fixture,
     keyword_entities_fixture,
     note_summary_entity_fixture
 )
@@ -22,7 +21,6 @@ from domains.usecases.notes_usecase import (
 )
 from core.exceptions import (
     NoteNameIntegrityError,
-    KeywordPosIdIntegrityError,
 )
 from di.notes_factory import (
     NoteFactory,
@@ -62,17 +60,29 @@ def test_keyword_entity_consistency(note_entity_fixture):
     """
     ```yaml
     Keyword:
+        id: integer
         noteId: integer
-        posId: integer
+        posX: integer
+        posY: integer
         text: string
+        parentId: integer
+        status: integer
+            - 1: UNSELECT
+            - 2: READ
+            - 3: EDIT
+        timestamp: integer
     ```
     """
     keywords: List[KeywordEntity] = note_entity_fixture.keywords
 
     for keyword in keywords:
         assert isinstance(keyword.noteId, int)
-        assert isinstance(keyword.posId, int)
+        assert isinstance(keyword.posX, int)
+        assert isinstance(keyword.posY, int)
         assert isinstance(keyword.text, str)
+        assert isinstance(keyword.parentId, int) or keyword.parentId == None
+        assert isinstance(keyword.status, int)
+        assert isinstance(keyword.timestamp, int)
 
 
 @pytest.mark.unit
@@ -91,7 +101,7 @@ def test_note_summary_consistency(note_summary_entity_fixture):
 
 
 @pytest.mark.unit
-def test_note_name_duplicate(note_request_dto_fixture, note_usecase_context_fixture):
+def test_note_name_duplicate(note_request_dto_fixture):
     """
     동일한 Author일 경우 Note.name을 중복해서 등록할 수 없습니다.
 
@@ -101,28 +111,9 @@ def test_note_name_duplicate(note_request_dto_fixture, note_usecase_context_fixt
     repository = Mock()
     repository.save.side_effect = NoteNameIntegrityError()
     usecase = NoteUsecase(
-        repository,
-        note_usecase_context_fixture
+        repository
     )
     with pytest.raises(NoteNameIntegrityError):
-        usecase.create(note_request_dto_fixture, user_id=1)
-
-
-@pytest.mark.unit
-def test_keyword_pos_id_duplicate(note_request_dto_fixture, note_usecase_context_fixture):
-    """
-    Keyword.posId는 Note내에서 중복을 허용하지 않습니다.
-
-    - 중복될 경우 repository.save는 IntegrityError를 raise합니다.
-    - usecase.create 호출 시 IntegrityError에 대해 NoteNameIntegrityError를 raise합니다.
-    """
-    repository = Mock()
-    repository.save.side_effect = KeywordPosIdIntegrityError()
-    usecase = NoteUsecase(
-        repository,
-        note_usecase_context_fixture
-    )
-    with pytest.raises(KeywordPosIdIntegrityError):
         usecase.create(note_request_dto_fixture, user_id=1)
 
 

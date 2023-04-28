@@ -1,3 +1,4 @@
+import time
 from typing import List
 import uuid
 
@@ -11,11 +12,9 @@ from domains.entities.notes_entity import (
 from adapters.dto.notes_dto import (
     NoteReqDto,
     KeywordReqDto,
-    NoteDto,
-    KeywordDto,
-    NoteSummaryDto
 )
 from core.models import StatusChoice
+from domains.entities.notes_entity import KeywordStatus
 from apps.users.models import User
 
 
@@ -27,9 +26,13 @@ def note_entity_fixture() -> NoteEntity:
         displayId=uuid.uuid4(),
         name='note1',
         keywords=[KeywordEntity(
-            noteId=1,
-            posId=i,
-            text='text'
+            id=i+1,
+            noteId=i+1,
+            posX=i * 10,
+            posY=i * 10,
+            text=f"text{i}",
+            status=KeywordStatus.UNSELECT.value,
+            timestamp=round(time.time())
         ) for i in range(0, 20, 2)],
         status=StatusChoice.SAVE
     )
@@ -45,26 +48,20 @@ def user_fixture() -> User:
 def note_request_dto_fixture() -> NoteReqDto:
     return NoteReqDto(
         name='note_request_dto_fixture',
-        keywords=[KeywordReqDto(posId=i, text=f'text{i}') for i in range(10)],
         status=StatusChoice.SAVE
     )
 
 
 @pytest.fixture
-def note_usecase_context_fixture() -> dict:
-    return {
-        'NoteDto': NoteDto,
-        'KeywordDto': KeywordDto,
-        'NoteSummaryDto': NoteSummaryDto
-    }
-
-
-@pytest.fixture
 def keyword_entities_fixture() -> List[KeywordEntity]:
     return [KeywordEntity(
-        noteId=1,
-        posId=i,
-        text=f'text{i}'
+        id=i+1,
+        noteId=i+1,
+        posX=i * 10,
+        posY=i * 10,
+        text=f"text{i}",
+        status=KeywordStatus.UNSELECT.value,
+        timestamp=round(time.time())
     ) for i in range(10)]
 
 
