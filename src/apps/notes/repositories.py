@@ -51,9 +51,9 @@ class NoteRepository(NoteRepositoryInterface):
             name=note.name
         ) for note in notes]
 
-    def find_one(self, display_id: str):
+    def find_one(self, key: str):
         try:
-            note = self.queryset.get(display_id=display_id)
+            note = self.queryset.get(display_id=key)
 
         except Note.DoesNotExist:
             raise NoteDoesNotExistError()
@@ -62,7 +62,7 @@ class NoteRepository(NoteRepositoryInterface):
             raise DatabaseError(e)
 
         self.set_model_instance(note)
-        self.check_permission()
+        self.check_permission(note.shared_only)
 
         return self.NoteEntity(
             id=note.pk,
@@ -82,13 +82,13 @@ class NoteRepository(NoteRepositoryInterface):
         )
 
     def save(self, **kwargs):
-        instance = self.get_model_instance()
+        note: Note = self.get_model_instance()
 
         # Check
 
-        if bool(instance):
-            self.check_permission()
-            instance.update(**kwargs)
+        if bool(note):
+            self.check_permission(note.author_only)
+            note.update(**kwargs)
         else:
             try:
                 with transaction.atomic():
@@ -114,3 +114,13 @@ class NoteRepository(NoteRepositoryInterface):
                 name=note.name,
                 status=note.status
             )
+    
+    def delete(self):
+        note: Note = self.get_model_instance()
+
+        try:
+            self.check_permission(note.author_only)
+            note.delete()
+
+        except Exception as e:
+            raise DatabaseError(e)

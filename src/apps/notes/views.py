@@ -27,3 +27,9 @@ class NoteDetailViewset(viewsets.ViewSet):
             request=request,
             key=display_id
         )
+    
+    def destroy(self, request: HttpRequest, display_id: str) -> Response:
+        return self.controller.delete(
+            request=request,
+            key=display_id
+        )

@@ -99,7 +99,7 @@ def test_note_exists():
     repo.authorize(user.pk)
 
     with pytest.raises(NoteDoesNotExistError):
-        repo.find_one(display_id=2)
+        repo.find_one(key=2)
     repo.find_one(note1.display_id)
 
 

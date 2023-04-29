@@ -15,3 +15,6 @@ class CRUDMixin:
 
     def update(self, key: object, req_body: object, **variables) -> Any:
         raise NotImplementedError()
+    
+    def delete(self, key: object, **variables) -> None:
+        raise NotImplementedError()

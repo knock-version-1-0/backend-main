@@ -25,7 +25,12 @@ class Note(TimestampedModel):
             setattr(self, key, value)
         self.save(update_fields=kwargs.keys())
     
-    def is_available(self, user):
+    def shared_only(self, user):
+        if user.pk != self.author.pk:
+            return False
+        return True
+
+    def author_only(self, user):
         if user.pk != self.author.pk:
             return False
         return True

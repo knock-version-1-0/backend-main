@@ -34,7 +34,6 @@ class BaseRepository:
         except User.DoesNotExist:
             raise UserInvalidError()
     
-    def check_permission(self):
-        instance = self.get_model_instance()
-        if not instance.is_available(self.user):
+    def check_permission(self, callback):
+        if not callback(self.user):
             raise UserPermissionError()

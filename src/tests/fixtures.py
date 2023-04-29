@@ -61,7 +61,7 @@ def keyword_entities_fixture() -> List[KeywordEntity]:
         posY=i * 10,
         text=f"text{i}",
         status=KeywordStatus.UNSELECT.value,
-        timestamp=round(time.time())
+        timestamp=str(round(time.time()))
     ) for i in range(10)]
 
 

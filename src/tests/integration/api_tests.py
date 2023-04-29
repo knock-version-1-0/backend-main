@@ -103,3 +103,37 @@ def test_GET_notes_list(user_fixture):
     response = client.get(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.data['type'] == 'UserInvalidError'
+
+
+@pytest.mark.django_db
+def test_DELETE_notes_list(user_fixture):
+    client = APIClient()
+    set_credential(client, token=user_fixture.token)
+
+    notes = NoteModelFactory.create_batch(size=5)
+    
+    note = notes.pop()
+    url = reverse('notes-detail', args=[note.display_id])
+    response = client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    url = reverse('notes-detail', args=[uuid.uuid4()])
+    response = client.delete(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.data['type'] == 'NoteDoesNotExistError'
+
+    note = notes.pop()
+    url = reverse('notes-detail', args=[note.display_id])
+    user_fixture.is_active = False
+    user_fixture.save()
+    response = client.delete(url)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.data['type'] == 'UserInvalidError'
+
+    note = notes.pop()
+    url = reverse('notes-detail', args=[note.display_id])
+    user2 = get_user_model().objects.create_user('user2')
+    set_credential(client, token=user2.token)
+    response = client.delete(url)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.data['type'] == 'UserPermissionError'

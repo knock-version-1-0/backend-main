@@ -34,7 +34,7 @@ class NoteUsecase(BaseUsecase):
 
     @authorize_required
     def retrieve(self, key: str, user_id: int):
-        entity = self.repository.find_one(display_id=key)
+        entity = self.repository.find_one(key=key)
 
         return entity.dict()
 
@@ -46,3 +46,8 @@ class NoteUsecase(BaseUsecase):
         )
 
         return entity.dict()
+
+    @authorize_required
+    def delete(self, key: str, user_id: int):
+        self.repository.find_one(key=key)
+        self.repository.delete()

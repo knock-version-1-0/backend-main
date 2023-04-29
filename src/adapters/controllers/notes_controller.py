@@ -31,3 +31,9 @@ class NoteController(BaseController):
         payload, status = self.service.create(request.data, user_id=request.user.pk)
         
         return Response(payload, status=status)
+    
+    def delete(self, request: HttpRequest, key: str) -> Response:
+        display_id = key
+        payload, status = self.service.delete(key=display_id, user_id=request.user.pk)
+
+        return Response(payload, status=status)
