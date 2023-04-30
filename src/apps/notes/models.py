@@ -19,6 +19,7 @@ class Note(TimestampedModel):
         indexes = [
             models.Index(fields=['name', 'author'])
         ]
+        ordering = ['-pk']
     
     def update(self, **kwargs):
         for key, value in kwargs.items():
