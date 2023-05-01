@@ -11,7 +11,16 @@ from tests.fixtures import user_fixture, note_request_dto_fixture
 from tests.factories import NoteModelFactory
 from di.notes_factory import NoteFactory
 from apps.notes.models import Note
-from domains.constants import MAX_NOTE_LIST_LIMIT
+from domains.constants import MAX_NOTE_LIST_LIMIT, NOTE_NAME_LENGTH_LIMIT
+from core.models import StatusChoice
+from core.exceptions import (
+    NoteDoesNotExistError,
+    UserInvalidError,
+    UserPermissionError,
+    NoteNameIntegrityError,
+    NoteNameLengthLimitError
+)
+from core.utils.exceptions import get_error_name
 
 
 def set_credential(client, token):
@@ -38,21 +47,21 @@ def test_GET_notes_detail(user_fixture, note_request_dto_fixture):
     url = reverse('notes-detail', args=[uuid.uuid4()])
     response = client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.data['type'] == 'NoteDoesNotExistError'
+    assert response.data['type'] == get_error_name(NoteDoesNotExistError())
 
     user_fixture.is_active = False
     user_fixture.save()
     url = reverse('notes-detail', args=[display_id])
     response = client.get(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.data['type'] == 'UserInvalidError'
+    assert response.data['type'] == get_error_name(UserInvalidError())
 
     user2 = get_user_model().objects.create_user('user2')
     set_credential(client, token=user2.token)
     url = reverse('notes-detail', args=[display_id])
     response = client.get(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
-    assert response.data['type'] == 'UserPermissionError'
+    assert response.data['type'] == get_error_name(UserPermissionError())
 
 
 @pytest.mark.django_db
@@ -64,14 +73,14 @@ def test_POST_notes_list(user_fixture, note_request_dto_fixture):
     url = reverse('notes-list')
     response = client.post(url, req_dto.dict(), format='json')
 
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_201_CREATED
     usecase = NoteFactory().usecase
     resp = usecase.retrieve(response.data['displayId'], user_id=user_fixture.id)
     assert response.data == resp
 
     response = client.post(url, req_dto.dict(), format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.data['type'] == 'NoteNameIntegrityError'
+    assert response.data['type'] == get_error_name(NoteNameIntegrityError())
 
 
 @pytest.mark.django_db
@@ -102,7 +111,7 @@ def test_GET_notes_list(user_fixture):
     user_fixture.save()
     response = client.get(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.data['type'] == 'UserInvalidError'
+    assert response.data['type'] == get_error_name(UserInvalidError())
 
 
 @pytest.mark.django_db
@@ -120,7 +129,7 @@ def test_DELETE_notes_list(user_fixture):
     url = reverse('notes-detail', args=[uuid.uuid4()])
     response = client.delete(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.data['type'] == 'NoteDoesNotExistError'
+    assert response.data['type'] == get_error_name(NoteDoesNotExistError())
 
     note = notes.pop()
     url = reverse('notes-detail', args=[note.display_id])
@@ -128,7 +137,7 @@ def test_DELETE_notes_list(user_fixture):
     user_fixture.save()
     response = client.delete(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    assert response.data['type'] == 'UserInvalidError'
+    assert response.data['type'] == get_error_name(UserInvalidError())
 
     note = notes.pop()
     url = reverse('notes-detail', args=[note.display_id])
@@ -136,4 +145,90 @@ def test_DELETE_notes_list(user_fixture):
     set_credential(client, token=user2.token)
     response = client.delete(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
-    assert response.data['type'] == 'UserPermissionError'
+    assert response.data['type'] == get_error_name(UserPermissionError())
+
+
+@pytest.mark.django_db
+def test_PATCH_notes_detail(user_fixture, note_request_dto_fixture):
+    client = APIClient()
+    set_credential(client, token=user_fixture.token)
+
+    usecase = NoteFactory().usecase
+    resp = usecase.create(
+        note_request_dto_fixture,
+        user_id=user_fixture.id
+    )
+    display_id = resp['displayId']
+
+    changed_name = 'note_name1'
+    req_data = {
+        'name': changed_name
+    }
+    url = reverse('notes-detail', args=[display_id])
+    response = client.patch(url, data=req_data, format='json')
+    assert response.status_code == status.HTTP_200_OK
+    for key, value in resp.items():
+        if key == 'name':
+            assert response.data[key] == changed_name
+        else:
+            assert response.data[key] == value
+
+    req_data = {
+        'status': StatusChoice.EXPIRE
+    }
+    url = reverse('notes-detail', args=[display_id])
+    response = client.patch(url, data=req_data, format='json')
+    assert response.status_code == status.HTTP_200_OK
+    for key, value in resp.items():
+        if key == 'status':
+            assert response.data[key] == StatusChoice.EXPIRE
+        elif key == 'name':
+            assert response.data[key] == changed_name
+        else:
+            assert response.data[key] == value
+
+    usecase = NoteFactory().usecase
+    resp = usecase.create(
+        note_request_dto_fixture,
+        user_id=user_fixture.id
+    )
+    display_id = resp['displayId']
+
+    req_data = {
+        'name': changed_name
+    }
+    url = reverse('notes-detail', args=[display_id])
+    response = client.patch(url, data=req_data, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data['type'] == get_error_name(NoteNameIntegrityError())
+
+    req_data = {
+        'name': 'n' * (NOTE_NAME_LENGTH_LIMIT+1)
+    }
+    url = reverse('notes-detail', args=[display_id])
+    response = client.patch(url, data=req_data, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data['type'] == get_error_name(NoteNameLengthLimitError(NOTE_NAME_LENGTH_LIMIT))
+
+    req_data = {
+        'name': 'new name 1'
+    }
+    url = reverse('notes-detail', args=[uuid.uuid4()])
+    response = client.patch(url, data=req_data, format='json')
+    print(response.data)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.data['type'] == get_error_name(NoteDoesNotExistError())
+
+    user_fixture.is_active = False
+    user_fixture.save()
+    url = reverse('notes-detail', args=[display_id])
+    response = client.patch(url, data=req_data, format='json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.data['type'] == get_error_name(UserInvalidError())
+
+    user2 = get_user_model().objects.create_user('user2')
+    set_credential(client, token=user2.token)
+    url = reverse('notes-detail', args=[display_id])
+    response = client.patch(url, data=req_data, format='json')
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.data['type'] == get_error_name(UserPermissionError())

@@ -32,6 +32,12 @@ class NoteController(BaseController):
         
         return Response(payload, status=status)
     
+    def update(self, request: HttpRequest, key: str) -> Response:
+        display_id = key
+        payload, status = self.service.update(key=display_id, req_body=request.data, user_id=request.user.pk)
+
+        return Response(payload, status=status)
+    
     def delete(self, request: HttpRequest, key: str) -> Response:
         display_id = key
         payload, status = self.service.delete(key=display_id, user_id=request.user.pk)

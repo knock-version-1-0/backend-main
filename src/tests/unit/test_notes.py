@@ -21,13 +21,14 @@ from domains.usecases.notes_usecase import (
 )
 from core.exceptions import (
     NoteNameIntegrityError,
+    NoteNameLengthLimitError
 )
 from di.notes_factory import (
     NoteFactory,
 )
 from apps.notes.models import Note
 from core.models import StatusChoice
-from domains.constants import MAX_NOTE_LIST_LIMIT
+from domains.constants import MAX_NOTE_LIST_LIMIT, NOTE_NAME_LENGTH_LIMIT
 
 
 @pytest.mark.unit
@@ -171,3 +172,28 @@ def test_note_list_limit():
         'offset': 0
     })
     assert len(entities) == MAX_NOTE_LIST_LIMIT
+
+
+@pytest.mark.unit
+def test_note_name_length_limit():
+    """
+    Note name의 length는 25를 초과할 수 없습니다.
+    """
+    note = NoteEntity(
+        id=1,
+        displayId=uuid.uuid4(),
+        authorId=1,
+        name='name',
+        keywords=[],
+        status=1
+    )
+
+    with pytest.raises(NoteNameLengthLimitError):
+        note = NoteEntity(
+            id=1,
+            displayId=uuid.uuid4(),
+            authorId=1,
+            name='n' * (NOTE_NAME_LENGTH_LIMIT+1),
+            keywords=[],
+            status=1
+        )

@@ -18,7 +18,8 @@ from core.exceptions import (
     NoteNameIntegrityError,
     UserInvalidError,
     DatabaseError,
-    UserPermissionError
+    UserPermissionError,
+    NoteNameLengthLimitError
 )
 
 logger = logging.getLogger(__name__)
@@ -87,6 +88,46 @@ class NoteService(BaseService):
             return error_wrapper(e, status_code)
 
         return (obj, status_code)
+    
+    def update(self, key: str, req_body: QueryDict, user_id: int) -> Tuple[dict, StatusCode]:
+        status_code = None
+        parse = lambda o: NoteReqDto(**o)
+
+        try:
+            status_code = status.HTTP_200_OK
+            obj = self.usecase.update(key=key, req_body=parse(req_body), user_id=user_id)
+        
+        except NoteNameIntegrityError as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+        
+        except NoteNameLengthLimitError as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+        
+        except UserInvalidError as e:
+            status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except UserPermissionError as e:
+            status_code = status.HTTP_403_FORBIDDEN
+            return error_wrapper(e, status_code)
+        
+        except NoteDoesNotExistError as e:
+            status_code = status.HTTP_404_NOT_FOUND
+            return error_wrapper(e, status_code)
+        
+        except DatabaseError as e:
+            logger.error(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+        
+        except Exception as e:
+            logger.debug(e)
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+
+        return (obj, status_code)
 
     def create(self, req_body: QueryDict, user_id: int) -> Tuple[dict, StatusCode]:
         status_code = None
@@ -96,7 +137,7 @@ class NoteService(BaseService):
         )
 
         try:
-            status_code = status.HTTP_200_OK
+            status_code = status.HTTP_201_CREATED
             obj = self.usecase.create(req_body=parse(req_body), user_id=user_id)
         
         except NoteNameIntegrityError as e:
@@ -145,6 +186,11 @@ class NoteService(BaseService):
         except DatabaseError as e:
             logger.error(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+        
+        except Exception as e:
+            logger.debug(e)
+            status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
 
         return (obj, status_code)

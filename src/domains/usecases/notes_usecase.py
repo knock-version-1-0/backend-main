@@ -8,6 +8,7 @@ from domains.interfaces.notes_repository import (
     NoteRepository
 )
 from domains.constants import MAX_NOTE_LIST_LIMIT
+from adapters.dto.notes_dto import NoteReqDto
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +40,18 @@ class NoteUsecase(BaseUsecase):
         return entity.dict()
 
     @authorize_required
-    def create(self, req_body, user_id: int):
+    def create(self, req_body: NoteReqDto, user_id: int):
         entity = self.repository.save(
             name=req_body.name,
             status=req_body.status
         )
+
+        return entity.dict()
+
+    @authorize_required
+    def update(self, key: str, req_body: NoteReqDto, user_id: int) -> dict:
+        self.repository.find_one(key=key)
+        entity = self.repository.save(**req_body.dict())
 
         return entity.dict()
 

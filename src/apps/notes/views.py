@@ -33,3 +33,9 @@ class NoteDetailViewset(viewsets.ViewSet):
             request=request,
             key=display_id
         )
+    
+    def partial_update(self, request: HttpRequest, display_id: str) -> Response:
+        return self.controller.update(
+            request=request,
+            key=display_id
+        )

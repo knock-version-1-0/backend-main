@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from core.models import TimestampedModel, StatusField
+from core.utils.typing import Empty
 
 
 class Note(TimestampedModel):
@@ -22,9 +23,12 @@ class Note(TimestampedModel):
         ordering = ['-pk']
     
     def update(self, **kwargs):
+        update_fields = []
         for key, value in kwargs.items():
-            setattr(self, key, value)
-        self.save(update_fields=kwargs.keys())
+            if value is not Empty:
+                setattr(self, key, value)
+                update_fields.append(key)
+        self.save(update_fields=update_fields)
     
     def shared_only(self, user):
         if user.pk != self.author.pk:

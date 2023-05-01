@@ -1,9 +1,10 @@
 from typing import (
     Any,
 )
-
 from pydantic import validate_model
 from pydantic.error_wrappers import ValidationError
+
+from core.utils.typing import Empty
 
 
 object_setattr = object.__setattr__
@@ -33,6 +34,10 @@ class RequestBody:
         # Uses something other than `self` the first arg to allow "self" as a settable attribute
         values, fields_set, validation_error = validate_model(__pydantic_self__.__class__, data)
 
+        for name, field in __pydantic_self__.__fields__.items():
+            if name not in fields_set:
+                values[name] = Empty
+
         if validation_error:
             _errors = []
             for e in validation_error.errors():
@@ -41,6 +46,7 @@ class RequestBody:
                 _errors.append(e)
             if len(_errors) > 0:
                 raise ValidationError(_errors, validation_error.model)
+
         try:
             object_setattr(__pydantic_self__, '__dict__', values)
         except TypeError as e:

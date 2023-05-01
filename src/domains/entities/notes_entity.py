@@ -1,8 +1,10 @@
 from enum import Enum
 from typing import List, Optional
 import uuid
-
 from pydantic import BaseModel, validator
+
+from core.exceptions.notes import NoteNameLengthLimitError
+from domains.constants import NOTE_NAME_LENGTH_LIMIT
 
 
 class KeywordStatus(Enum):
@@ -34,6 +36,12 @@ class NoteEntity(BaseModel):
     def uuid_to_str(cls, v):
         if isinstance(v, uuid.UUID):
             return str(v)
+        return v
+    
+    @validator('name', pre=True)
+    def check_name_length_limit(cls, v):
+        if len(v) > NOTE_NAME_LENGTH_LIMIT:
+            raise NoteNameLengthLimitError(NOTE_NAME_LENGTH_LIMIT)
         return v
 
 

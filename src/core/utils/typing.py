@@ -8,3 +8,5 @@ def make_code(type: str, detail: Optional[str]=None) -> dict:
         'type': type,
         'message': detail,
     }
+
+Empty = object

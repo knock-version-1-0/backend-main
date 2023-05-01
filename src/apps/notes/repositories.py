@@ -84,36 +84,40 @@ class NoteRepository(NoteRepositoryInterface):
     def save(self, **kwargs):
         note: Note = self.get_model_instance()
 
-        # Check
-
         if bool(note):
             self.check_permission(note.author_only)
-            note.update(**kwargs)
-        else:
+
             try:
                 with transaction.atomic():
-                    try:
-                        note = self.queryset.create(
-                            author=self.user,
-                            **kwargs
-                        )
+                    note.update(**kwargs)
 
-                    except IntegrityError:
-                        raise NoteNameIntegrityError()
-
-            except NoteNameIntegrityError as e:
-                raise e
+            except IntegrityError:
+                raise NoteNameIntegrityError()
 
             except Exception as e:
                 raise DatabaseError(e)
 
-            return self.NoteEntity(
-                id=note.pk,
-                displayId=note.display_id,
-                authorId=note.author.pk,
-                name=note.name,
-                status=note.status
-            )
+        else:
+            try:
+                with transaction.atomic():
+                    note = Note.objects.create(
+                        author=self.user,
+                        **kwargs
+                    )
+
+            except IntegrityError:
+                raise NoteNameIntegrityError()
+
+            except Exception as e:
+                raise DatabaseError(e)
+
+        return self.NoteEntity(
+            id=note.pk,
+            displayId=note.display_id,
+            authorId=note.author.pk,
+            name=note.name,
+            status=note.status
+        )
     
     def delete(self):
         note: Note = self.get_model_instance()
