@@ -40,7 +40,7 @@ class NoteRepository(NoteRepositoryInterface):
 
             notes = self.queryset.filter(
                         author=self.user,
-                        name__contains=lookup.get('name', '')
+                        name__icontains=lookup.get('name', '')
                     )[offset:offset+limit]
         
         except Exception as e:
