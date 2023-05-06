@@ -41,9 +41,9 @@ class Note(TimestampedModel):
         return True
 
 
-class StatusChoice(models.IntegerChoices):
+class KeywordStatusChoice(models.IntegerChoices):
     UNSELECT = (1, 'UNSELECT')
-    READ = (2, 'READ')
+    SELECT = (2, 'SELECT')
     EDIT = (3, 'EDIT')
 
 
@@ -53,7 +53,7 @@ class Keyword(models.Model):
     pos_x = models.IntegerField()
     pos_y = models.IntegerField()
     text = models.CharField(max_length=12, null=True, blank=True)
-    status = models.IntegerField(choices=StatusChoice.choices)
+    status = models.IntegerField(choices=KeywordStatusChoice.choices)
     timestamp = models.CharField(max_length=13)
 
     class Meta:

@@ -1,33 +1,27 @@
 import json
 
-from channels.generic.websocket import AsyncWebsocketConsumer
+from core.consumers import Consumer
+
+APP_NAME = "notes"
 
 
-class NoteConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = "note_%s" % self.room_name
-
-        await self.channel_layer.group_add(
-            self.room_group_name, self.channel_name
-        )
-        
-        await self.accept()
+class NoteUpdateKeyword(Consumer):
+    app_name = APP_NAME
+    key_name = "note_id"
     
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.room_group_name, self.channel_name
-        )
-    
-    async def receive(self, text_data=None, bytes_data=None):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "note_message", "message": message}
-        )
-    
-    async def note_message(self, event):
+    async def notes_message(self, event):
         message = event["message"]
+        data = json.loads(message)
 
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"status": 'OK', "data": data}))
+
+
+class NoteCreateKeyword(Consumer):
+    app_name = APP_NAME
+    key_name = "note_id"
+
+    async def notes_message(self, event):
+        message = event["message"]
+        data = json.loads(message)
+
+        await self.send(text_data=json.dumps({"status": 'OK', "data": data}))

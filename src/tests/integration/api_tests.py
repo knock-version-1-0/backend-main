@@ -42,7 +42,7 @@ def test_GET_notes_detail(user_fixture, note_request_dto_fixture):
     url = reverse('notes-detail', args=[display_id])
     response = client.get(url)
     assert response.status_code == status.HTTP_200_OK
-    assert response.data == resp
+    assert response.data['data'] == resp
 
     url = reverse('notes-detail', args=[uuid.uuid4()])
     response = client.get(url)
@@ -72,11 +72,12 @@ def test_POST_notes_list(user_fixture, note_request_dto_fixture):
     req_dto = note_request_dto_fixture
     url = reverse('notes-list')
     response = client.post(url, req_dto.dict(), format='json')
+    response_data = response.data['data']
 
     assert response.status_code == status.HTTP_201_CREATED
     usecase = NoteFactory().usecase
-    resp = usecase.retrieve(response.data['displayId'], user_id=user_fixture.id)
-    assert response.data == resp
+    resp = usecase.retrieve(response_data['displayId'], user_id=user_fixture.id)
+    assert response_data == resp
 
     response = client.post(url, req_dto.dict(), format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -96,16 +97,19 @@ def test_GET_notes_list(user_fixture):
     url = reverse('notes-list')
     response = client.get(url, {'name': note_obj.name})
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 1
-    assert response.data[0]['name'] == note_obj.name
+    response_data = response.data['data']
+    assert len(response_data) == 1
+    assert response_data[0]['name'] == note_obj.name
 
     response = client.get(url, {'offset': 0})
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == MAX_NOTE_LIST_LIMIT
+    response_data = response.data['data']
+    assert len(response_data) == MAX_NOTE_LIST_LIMIT
     
     response = client.get(url, {'offset': 10, 'limit': 5})
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 5
+    response_data = response.data['data']
+    assert len(response_data) == 5
 
     user_fixture.is_active = False
     user_fixture.save()
@@ -167,11 +171,12 @@ def test_PATCH_notes_detail(user_fixture, note_request_dto_fixture):
     url = reverse('notes-detail', args=[display_id])
     response = client.patch(url, data=req_data, format='json')
     assert response.status_code == status.HTTP_200_OK
+    response_data = response.data['data']
     for key, value in resp.items():
         if key == 'name':
-            assert response.data[key] == changed_name
+            assert response_data[key] == changed_name
         else:
-            assert response.data[key] == value
+            assert response_data[key] == value
 
     req_data = {
         'status': StatusChoice.EXPIRE
@@ -179,13 +184,14 @@ def test_PATCH_notes_detail(user_fixture, note_request_dto_fixture):
     url = reverse('notes-detail', args=[display_id])
     response = client.patch(url, data=req_data, format='json')
     assert response.status_code == status.HTTP_200_OK
+    response_data = response.data['data']
     for key, value in resp.items():
         if key == 'status':
-            assert response.data[key] == StatusChoice.EXPIRE
+            assert response_data[key] == StatusChoice.EXPIRE
         elif key == 'name':
-            assert response.data[key] == changed_name
+            assert response_data[key] == changed_name
         else:
-            assert response.data[key] == value
+            assert response_data[key] == value
 
     usecase = NoteFactory().usecase
     resp = usecase.create(
