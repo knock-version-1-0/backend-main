@@ -25,7 +25,7 @@ class Note(TimestampedModel):
     def update(self, **kwargs):
         update_fields = []
         for key, value in kwargs.items():
-            if value is not Empty:
+            if not isinstance(value, Empty):
                 setattr(self, key, value)
                 update_fields.append(key)
         self.save(update_fields=update_fields)

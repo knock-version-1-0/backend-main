@@ -36,7 +36,7 @@ class RequestBody:
 
         for name, field in __pydantic_self__.__fields__.items():
             if name not in fields_set:
-                values[name] = Empty
+                values[name] = Empty()
 
         if validation_error:
             _errors = []
@@ -55,3 +55,11 @@ class RequestBody:
             ) from e
         object_setattr(__pydantic_self__, '__fields_set__', fields_set)
         __pydantic_self__._init_private_attributes()
+    
+    def data(self) -> dict:
+        _dict = self.__dict__
+        rst = {}
+        for k, v in _dict.items():
+            if not isinstance(v, Empty):
+                rst[k] = v
+        return rst

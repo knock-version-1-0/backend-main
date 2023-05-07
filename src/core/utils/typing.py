@@ -7,4 +7,5 @@ DTO = object
 def make_error_detail(type: str, detail: Optional[str]=None) -> ErrorDetail:
     return ErrorDetail(type=type, message=detail)
 
-Empty = object
+class Empty:
+    pass

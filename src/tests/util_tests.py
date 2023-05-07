@@ -19,5 +19,4 @@ def test_request_body():
 
     assert model.a == 'str'
     assert isinstance(model.a, str)
-    assert model.b == Empty
     assert isinstance(model.b, Empty)

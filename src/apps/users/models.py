@@ -15,7 +15,7 @@ from core.models import TimestampedModel
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email=None, password=None):
+    def create_user(self, username, email=None, password=None) -> 'User':
         if username is None:
             raise TypeError('Users must have a username.')
         

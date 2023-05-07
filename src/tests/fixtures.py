@@ -1,7 +1,8 @@
 import time
-from typing import List
+from typing import List, Tuple
 import uuid
 import pytest
+from rest_framework.test import APIClient
 
 from domains.entities.notes_entity import (
     NoteEntity,
@@ -15,6 +16,7 @@ from adapters.dto.notes_dto import (
 from core.models import StatusChoice
 from domains.entities.notes_entity import KeywordStatus
 from apps.users.models import User
+from di.notes_factory import NoteFactory
 
 
 @pytest.fixture
@@ -70,3 +72,21 @@ def note_summary_entity_fixture() -> NoteSummaryEntity:
         displayId=uuid.uuid4(),
         name='note1'
     )
+
+
+def set_credential(client, token):
+    client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
+
+
+@pytest.fixture
+def auth_client_fixture() -> Tuple[APIClient, User, set_credential]:
+    client = APIClient()
+    user = User.objects.create_user('fixture_user')
+    set_credential(client, user.token)
+
+    return (client, user, set_credential)
+
+
+@pytest.fixture(scope='session')
+def note_factory_fixture() -> NoteFactory:
+    return NoteFactory()

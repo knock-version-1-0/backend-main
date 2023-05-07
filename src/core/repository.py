@@ -1,7 +1,7 @@
 from typing import Optional
 
 from django.contrib.auth import get_user_model
-from core.exceptions import UserInvalidError, UserPermissionError
+from core.exceptions.users import UserInvalidError, UserPermissionError
 
 
 class BaseRepository:
