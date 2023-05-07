@@ -1,10 +1,9 @@
 from typing import Optional, Any
-
-from django.http.request import QueryDict
+from rest_framework.request import QueryDict
 
 
 class CRUDMixin:
-    def list(self, params: Optional[QueryDict]=None, **variables):
+    def list(self, params: Optional[QueryDict]=None, **variables) -> Any:
         raise NotImplementedError()
 
     def retrieve(self, key: object, **variables) -> Any:

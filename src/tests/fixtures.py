@@ -1,7 +1,6 @@
 import time
 from typing import List
 import uuid
-
 import pytest
 
 from domains.entities.notes_entity import (

@@ -1,7 +1,6 @@
 import logging
-from typing import Tuple, Optional, Union, List
-from core.utils.typing import StatusCode
-from core.data import ApiPayload, ErrorDetail
+from typing import Optional
+from core.data import ApiPayload
 
 from django.http.request import QueryDict
 from rest_framework import status
@@ -35,7 +34,7 @@ class NoteService(BaseService):
     def __init__(self, usecase: NoteUsecase):
         self.usecase = usecase
     
-    def list(self, params=None, user_id: Optional[int]=None) -> Tuple[Union[ApiPayload, ErrorDetail], StatusCode]:
+    def list(self, params: Optional[QueryDict]=None, user_id: Optional[int]=None):
         status_code = None
 
         try:
@@ -53,12 +52,12 @@ class NoteService(BaseService):
 
         except Exception as e:
             logger.debug(e)
-            status_code = status.HTTP_400_BAD_REQUEST
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
 
         return (ApiPayload(status='OK', data=obj), status_code)
     
-    def retrieve(self, key: str, user_id: int) -> Tuple[Union[ApiPayload, ErrorDetail], StatusCode]:
+    def retrieve(self, key: str, user_id: int):
         name = key
         status_code = None
 
@@ -85,12 +84,12 @@ class NoteService(BaseService):
         
         except Exception as e:
             logger.debug(e)
-            status_code = status.HTTP_400_BAD_REQUEST
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
 
         return (ApiPayload(status='OK', data=obj), status_code)
     
-    def update(self, key: str, req_body: QueryDict, user_id: int) -> Tuple[Union[ApiPayload, ErrorDetail], StatusCode]:
+    def update(self, key: str, req_body: QueryDict, user_id: int):
         status_code = None
         parse = lambda o: NoteReqDto(**o)
 
@@ -125,12 +124,12 @@ class NoteService(BaseService):
         
         except Exception as e:
             logger.debug(e)
-            status_code = status.HTTP_400_BAD_REQUEST
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
 
         return (ApiPayload(status='OK', data=obj), status_code)
 
-    def create(self, req_body: QueryDict, user_id: int) -> Tuple[Union[ApiPayload, ErrorDetail], StatusCode]:
+    def create(self, req_body: QueryDict, user_id: int):
         status_code = None
         parse = lambda o: NoteReqDto(
             name=o['name'],
@@ -160,12 +159,12 @@ class NoteService(BaseService):
         
         except Exception as e:
             logger.debug(e)
-            status_code = status.HTTP_400_BAD_REQUEST
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
         return (ApiPayload(status='CREATED', data=obj), status_code)
     
-    def delete(self, key: str, user_id: int) -> Tuple[Union[None, ErrorDetail], StatusCode]:
+    def delete(self, key: str, user_id: int):
         status_code = None
 
         try:
@@ -191,7 +190,7 @@ class NoteService(BaseService):
         
         except Exception as e:
             logger.debug(e)
-            status_code = status.HTTP_400_BAD_REQUEST
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
 
         return (ApiPayload(status='NO_CONTENT', data=obj), status_code)

@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+from rest_framework.request import QueryDict
 
 from core.utils.decorators import authorize_required
 from core.usecase import BaseUsecase
@@ -23,8 +24,8 @@ class NoteUsecase(BaseUsecase):
         self.repository = repository
 
     @authorize_required
-    def list(self, params=None, user_id: Optional[int]=None):
-        params = params or {}
+    def list(self, params: Optional[QueryDict]=None, user_id: Optional[int]=None):
+        params = params or QueryDict({})
         entities = self.repository.find_by_author(lookup={
             'name': params.get('name', ''),
             'offset': int(params.get('offset', 0)),
