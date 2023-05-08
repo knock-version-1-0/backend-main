@@ -1,8 +1,9 @@
 from typing import (
     Any,
 )
-from pydantic import validate_model
+from pydantic import validate_model, BaseModel
 from pydantic.error_wrappers import ValidationError
+import json
 
 from core.utils.typing import Empty
 
@@ -11,7 +12,7 @@ object_setattr = object.__setattr__
 MISSING = 'value_error.missing'
 
 
-class RequestBody:
+class RequestBody(BaseModel):
     """
     If you wish to exclude validation for missing fields of the BaseModel,
     you can inherit from the RequestBody class.\n
@@ -20,9 +21,7 @@ class RequestBody:
     To do this, you can follow the example shown below:
 
     For example:
-    class Model(RequestBody, BaseModel): ...
-
-    Please make sure that the RequestBody class is inherited before the BaseModel class.
+    class Model(RequestBody): ...
     """
 
     def __init__(__pydantic_self__, **data: Any) -> None:
@@ -56,7 +55,7 @@ class RequestBody:
         object_setattr(__pydantic_self__, '__fields_set__', fields_set)
         __pydantic_self__._init_private_attributes()
     
-    def repr(self) -> dict:
+    def query_dict(self):
         _dict = self.__dict__
         rst = {}
         for k, v in _dict.items():

@@ -1,11 +1,9 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
-
 from core.utils.pydantic import RequestBody
 
 
-class KeywordReqDto(RequestBody, BaseModel):
+class KeywordReqDto(RequestBody):
     noteId: int
     posX: int
     posY: int
@@ -26,7 +24,7 @@ class KeywordReqDto(RequestBody, BaseModel):
         }
 
 
-class NoteReqDto(RequestBody, BaseModel):
+class NoteReqDto(RequestBody):
     name: str
     status: int
 

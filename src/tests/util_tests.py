@@ -11,7 +11,7 @@ from core.exceptions import (
 from tests.fixtures.users import user_fixture
 
 
-class Model(RequestBody, BaseModel):
+class Model(RequestBody):
     a: str
     b: int
     c: int
