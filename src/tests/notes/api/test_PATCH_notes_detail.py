@@ -22,7 +22,7 @@ def test_200_OK(auth_client_fixture):
     req_dto = NoteReqDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     response_data = response.data['data']
 
     assert response.status_code == 200
@@ -36,7 +36,7 @@ def test_200_OK(auth_client_fixture):
     req_dto = NoteReqDto(status=StatusChoice.EXPIRE)
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     response_data = response.data['data']
 
     assert response.status_code == 200
@@ -60,13 +60,13 @@ def test_400_NoteNameIntegrityError(auth_client_fixture):
     req_dto = NoteReqDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     assert response.status_code == 200
 
     note = make_notes(author_id=user.id, size=1)[0]
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     assert response.status_code == 400
     assert response.data['type'] == get_error_name(exceptions.notes.NoteNameIntegrityError())
 
@@ -79,7 +79,7 @@ def test_400_NoteNameLengthLimitError(auth_client_fixture):
     req_dto = NoteReqDto(name='n' * (NOTE_NAME_LENGTH_LIMIT+1))
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     assert response.status_code == 400
     assert response.data['type'] == get_error_name(exceptions.notes.NoteNameLengthLimitError(NOTE_NAME_LENGTH_LIMIT))
 
@@ -92,7 +92,7 @@ def test_404_NoteDoesNotExistError(auth_client_fixture):
     req_dto = NoteReqDto(name=changed_name)
 
     url = reverse('notes-detail', args=[uuid.uuid4()])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
 
     assert response.status_code == 404
     assert response.data['type'] == get_error_name(exceptions.notes.NoteDoesNotExistError())
@@ -111,7 +111,7 @@ def test_401_UserInvalidError(auth_client_fixture):
     req_dto = NoteReqDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     assert response.status_code == 401
     assert response.data['type'] == get_error_name(exceptions.users.UserInvalidError())
 
@@ -129,6 +129,6 @@ def test_403_UserPermissionError(auth_client_fixture):
     req_dto = NoteReqDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
-    response = client.patch(url, data=req_dto.data(), format='json')
+    response = client.patch(url, data=req_dto.repr(), format='json')
     assert response.status_code == 403
     assert response.data['type'] == get_error_name(exceptions.users.UserPermissionError())

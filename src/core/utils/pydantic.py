@@ -56,7 +56,7 @@ class RequestBody:
         object_setattr(__pydantic_self__, '__fields_set__', fields_set)
         __pydantic_self__._init_private_attributes()
     
-    def data(self) -> dict:
+    def repr(self) -> dict:
         _dict = self.__dict__
         rst = {}
         for k, v in _dict.items():
