@@ -1,8 +1,10 @@
 import pytest
-from datetime import timedelta
+import uuid
+from datetime import timedelta, datetime
 
 from domains.entities.users_entity import (
     UserEntity,
+    AuthSessionEntity,
 )
 from tests.fixtures.users import (
     user_entity_fixture,
@@ -10,6 +12,7 @@ from tests.fixtures.users import (
 from core.utils.jwt import parse_jwt_token, TokenData
 from apps.users.exceptions import (
     AuthTokenCannotRead,
+    AttemptLimitOver
 )
 
 
@@ -53,3 +56,25 @@ def test_user_token(user_entity_fixture):
         _ = user_entity.refreshToken
     with pytest.raises(AuthTokenCannotRead):
         _ = user_entity.accessToken
+
+
+@pytest.mark.unit
+def test_code_input_attempt_limit():
+    """
+    attempt는 최대 3회까지 가능합니다.
+    """
+    max_attempt = 3
+    _now = datetime.now()
+    session = AuthSessionEntity(
+        id=uuid.uuid4(),
+        email='user_name@email.com',
+        emailCode='602617',
+        exp=int((_now + timedelta(seconds=330)).strftime('%s')),
+        at=int(_now.strftime('%s')),
+        attempt=max_attempt
+    )
+
+    with pytest.raises(AttemptLimitOver):
+        _dt = session.dict()
+        _dt.pop('attempt')
+        _ = AuthSessionEntity(**_dt, attempt=max_attempt+1)

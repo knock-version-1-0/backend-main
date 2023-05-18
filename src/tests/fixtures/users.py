@@ -1,8 +1,11 @@
 import pytest
+import uuid
+import datetime
 
 from apps.users.models import User
 from domains.entities.users_entity import (
     UserEntity,
+    AuthSessionEntity,
 )
 
 

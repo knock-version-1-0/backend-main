@@ -1,16 +1,44 @@
 import jwt
+import uuid
 from datetime import datetime
 
 from django.conf import settings
-
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 
 from core.models import TimestampedModel
+from apps.users.exceptions import (
+    EmailValidationError
+)
 
 # Create your models here.
+
+
+class AuthSession(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True)
+    email_code = models.CharField(max_length=12)
+    exp = models.CharField(max_length=12)
+    at = models.CharField(max_length=12)
+    attempt = models.IntegerField(default=1)
+
+    class Meta:
+        db_table = 'users_auth_session'
+
+    def __str__(self):
+        return str(self.id)
+    
+    def save(self, *args, **kwargs):
+        try:
+            super().save(*args, **kwargs)
+        except ValidationError as e:
+            if 'email' in e.error_dict:
+                raise EmailValidationError
+            else:
+                raise e
 
 
 class UserManager(BaseUserManager):

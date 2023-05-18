@@ -16,7 +16,7 @@ from apps.users.exceptions import (
 from core.models import StatusChoice
 from di.notes_factory import NoteFactory
 from adapters.dto.notes_dto import (
-    NoteReqDto
+    NoteDto
 )
 from domains.constants import MAX_NOTE_LIST_LIMIT
 
@@ -38,13 +38,13 @@ def test_note_name_integrity():
     note = note_list[0]
 
     with pytest.raises(IntegrityError):
-        dto = NoteReqDto(
+        dto = NoteDto(
             name=note.name,
             status=StatusChoice.SAVE
         )
         repo.save(**dto.dict())
     
-    dto = NoteReqDto(
+    dto = NoteDto(
         name=create_note_name(),
         status=StatusChoice.SAVE
     )
@@ -54,12 +54,12 @@ def test_note_name_integrity():
     repo.find_one(key=note_list[size-1].displayId)
 
     with pytest.raises(IntegrityError):
-        dto = NoteReqDto(
+        dto = NoteDto(
             name=note.name
         )
         repo.save(**dto.dict())
     
-    dto = NoteReqDto(
+    dto = NoteDto(
         name=create_note_name(),
         status=StatusChoice.SAVE
     )
@@ -116,7 +116,7 @@ def test_filter_name_like():
     repository.authorize(author.id)
 
     for i in range(size):
-        dto = NoteReqDto(
+        dto = NoteDto(
             name=f'name{i}note',
             status=StatusChoice.SAVE
         )

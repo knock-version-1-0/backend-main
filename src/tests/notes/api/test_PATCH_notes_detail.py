@@ -16,7 +16,7 @@ from apps.users.exceptions import (
     UserPermissionError,
 )
 from core.models import StatusChoice
-from adapters.dto.notes_dto import NoteReqDto
+from adapters.dto.notes_dto import NoteDto
 from domains.constants import NOTE_NAME_LENGTH_LIMIT
 
 
@@ -27,7 +27,7 @@ def test_200_OK(auth_client_fixture):
     note = make_notes(author_id=user.id, size=1)[0]
 
     changed_name = 'note_changed_name'
-    req_dto = NoteReqDto(name=changed_name)
+    req_dto = NoteDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
@@ -41,7 +41,7 @@ def test_200_OK(auth_client_fixture):
         else:
             assert response_data[key] == value
 
-    req_dto = NoteReqDto(status=StatusChoice.EXPIRE)
+    req_dto = NoteDto(status=StatusChoice.EXPIRE)
 
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
@@ -65,7 +65,7 @@ def test_400_NoteNameIntegrityError(auth_client_fixture):
     note = make_notes(author_id=user.id, size=1)[0]
     changed_name = 'note_changed_name'
 
-    req_dto = NoteReqDto(name=changed_name)
+    req_dto = NoteDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
@@ -84,7 +84,7 @@ def test_400_NoteNameLengthLimitError(auth_client_fixture):
     client, user, set_credential = auth_client_fixture
 
     note = make_notes(author_id=user.id, size=1)[0]
-    req_dto = NoteReqDto(name='n' * (NOTE_NAME_LENGTH_LIMIT+1))
+    req_dto = NoteDto(name='n' * (NOTE_NAME_LENGTH_LIMIT+1))
 
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
@@ -97,7 +97,7 @@ def test_404_NoteDoesNotExistError(auth_client_fixture):
     client, user, set_credential = auth_client_fixture
 
     changed_name = 'note_changed_name'
-    req_dto = NoteReqDto(name=changed_name)
+    req_dto = NoteDto(name=changed_name)
 
     url = reverse('notes-detail', args=[uuid.uuid4()])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
@@ -116,7 +116,7 @@ def test_401_UserInvalidError(auth_client_fixture):
     user.save()
 
     changed_name = 'note_changed_name'
-    req_dto = NoteReqDto(name=changed_name)
+    req_dto = NoteDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
@@ -134,7 +134,7 @@ def test_403_UserPermissionError(auth_client_fixture):
     set_credential(client, token=other.token)
 
     changed_name = 'note_changed_name'
-    req_dto = NoteReqDto(name=changed_name)
+    req_dto = NoteDto(name=changed_name)
 
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')

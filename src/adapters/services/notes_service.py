@@ -7,8 +7,8 @@ from rest_framework import status
 from core.service import BaseService, error_wrapper
 
 from adapters.dto.notes_dto import (
-    NoteReqDto,
-    KeywordReqDto,
+    NoteDto,
+    KeywordDto,
 )
 from domains.usecases.notes_usecase import (
     NoteUsecase
@@ -22,7 +22,10 @@ from apps.users.exceptions import (
     UserInvalidError,
     UserPermissionError,
 )
-from core.exceptions import *
+from core.exceptions import (
+    DatabaseError,
+    ValidationError
+)
 
 
 logger = logging.getLogger(__name__)
@@ -94,11 +97,15 @@ class NoteService(BaseService):
     
     def update(self, key: str, req_body: QueryDict, user_id: int):
         status_code = None
-        parse = lambda o: NoteReqDto(**o)
+        parse = lambda o: NoteDto(**o)
 
         try:
             status_code = status.HTTP_200_OK
             obj = self.usecase.update(key=key, req_body=parse(req_body), user_id=user_id)
+        
+        except ValidationError as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
         
         except NoteNameIntegrityError as e:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -134,7 +141,7 @@ class NoteService(BaseService):
 
     def create(self, req_body: QueryDict, user_id: int):
         status_code = None
-        parse = lambda o: NoteReqDto(
+        parse = lambda o: NoteDto(
             name=o['name'],
             status=o['status']
         )
@@ -142,6 +149,10 @@ class NoteService(BaseService):
         try:
             status_code = status.HTTP_201_CREATED
             obj = self.usecase.create(req_body=parse(req_body), user_id=user_id)
+        
+        except ValidationError as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
         
         except NoteNameIntegrityError as e:
             status_code = status.HTTP_400_BAD_REQUEST

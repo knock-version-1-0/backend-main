@@ -3,7 +3,7 @@ from typing import List, Optional
 from core.utils.pydantic import RequestBody
 
 
-class KeywordReqDto(RequestBody):
+class KeywordDto(RequestBody):
     noteId: int
     posX: int
     posY: int
@@ -24,7 +24,7 @@ class KeywordReqDto(RequestBody):
         }
 
 
-class NoteReqDto(RequestBody):
+class NoteDto(RequestBody):
     name: str
     status: int
 

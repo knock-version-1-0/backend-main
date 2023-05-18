@@ -7,7 +7,7 @@ from core.utils.exceptions import get_error_name
 from apps.notes.exceptions import (
     NoteNameIntegrityError,
 )
-from adapters.dto.notes_dto import NoteReqDto
+from adapters.dto.notes_dto import NoteDto
 from core.models import StatusChoice
 
 
@@ -15,7 +15,7 @@ from core.models import StatusChoice
 def test_201_CREATED(auth_client_fixture, note_factory_fixture):
     client, user, set_credential = auth_client_fixture
 
-    req_dto = NoteReqDto(name='name', status=StatusChoice.SAVE)
+    req_dto = NoteDto(name='name', status=StatusChoice.SAVE)
 
     url = reverse('notes-list')
     response = client.post(url, req_dto.query_dict(), format='json')
@@ -31,7 +31,7 @@ def test_201_CREATED(auth_client_fixture, note_factory_fixture):
 def test_400_NoteNameIntegrityError(auth_client_fixture):
     client, user, set_credential = auth_client_fixture
 
-    req_dto = NoteReqDto(name='name', status=StatusChoice.SAVE)
+    req_dto = NoteDto(name='name', status=StatusChoice.SAVE)
 
     url = reverse('notes-list')
     response = client.post(url, req_dto.query_dict(), format='json')
