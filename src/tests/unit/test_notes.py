@@ -18,7 +18,7 @@ from domains.entities.notes_entity import (
 from domains.usecases.notes_usecase import (
     NoteUsecase,
 )
-from core.exceptions import (
+from apps.notes.exceptions import (
     NoteNameIntegrityError,
     NoteNameLengthLimitError
 )

@@ -1,5 +1,5 @@
 from typing import Optional
-from core.data import ErrorDetail
+from core.utils.data import ErrorDetail
 
 StatusCode = int
 DTO = object

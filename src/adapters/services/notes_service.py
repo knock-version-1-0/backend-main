@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from core.data import ApiPayload
+from core.utils.data import ApiPayload
 
 from django.http.request import QueryDict
 from rest_framework import status
@@ -13,7 +13,16 @@ from adapters.dto.notes_dto import (
 from domains.usecases.notes_usecase import (
     NoteUsecase
 )
-from core import exceptions
+from apps.notes.exceptions import (
+    NoteDoesNotExistError,
+    NoteNameIntegrityError,
+    NoteNameLengthLimitError,
+)
+from apps.users.exceptions import (
+    UserInvalidError,
+    UserPermissionError,
+)
+from core.exceptions import *
 
 
 logger = logging.getLogger(__name__)
@@ -35,11 +44,11 @@ class NoteService(BaseService):
             status_code = status.HTTP_200_OK
             obj = self.usecase.list(params, user_id=user_id)
         
-        except exceptions.users.UserInvalidError as e:
+        except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
             return error_wrapper(e, status_code)
         
-        except exceptions.DatabaseError as e:
+        except DatabaseError as e:
             logger.error(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
@@ -59,19 +68,19 @@ class NoteService(BaseService):
             status_code = status.HTTP_200_OK
             obj = self.usecase.retrieve(key=name, user_id=user_id)
 
-        except exceptions.notes.NoteDoesNotExistError as e:
+        except NoteDoesNotExistError as e:
             status_code = status.HTTP_404_NOT_FOUND
             return error_wrapper(e, status_code)
         
-        except exceptions.users.UserInvalidError as e:
+        except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
             return error_wrapper(e, status_code)
 
-        except exceptions.users.UserPermissionError as e:
+        except UserPermissionError as e:
             status_code = status.HTTP_403_FORBIDDEN
             return error_wrapper(e, status_code)
         
-        except exceptions.DatabaseError as e:
+        except DatabaseError as e:
             logger.error(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
@@ -91,27 +100,27 @@ class NoteService(BaseService):
             status_code = status.HTTP_200_OK
             obj = self.usecase.update(key=key, req_body=parse(req_body), user_id=user_id)
         
-        except exceptions.notes.NoteNameIntegrityError as e:
+        except NoteNameIntegrityError as e:
             status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
         
-        except exceptions.notes.NoteNameLengthLimitError as e:
+        except NoteNameLengthLimitError as e:
             status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
         
-        except exceptions.users.UserInvalidError as e:
+        except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
             return error_wrapper(e, status_code)
         
-        except exceptions.users.UserPermissionError as e:
+        except UserPermissionError as e:
             status_code = status.HTTP_403_FORBIDDEN
             return error_wrapper(e, status_code)
         
-        except exceptions.notes.NoteDoesNotExistError as e:
+        except NoteDoesNotExistError as e:
             status_code = status.HTTP_404_NOT_FOUND
             return error_wrapper(e, status_code)
         
-        except exceptions.DatabaseError as e:
+        except DatabaseError as e:
             logger.error(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
@@ -134,19 +143,19 @@ class NoteService(BaseService):
             status_code = status.HTTP_201_CREATED
             obj = self.usecase.create(req_body=parse(req_body), user_id=user_id)
         
-        except exceptions.notes.NoteNameIntegrityError as e:
+        except NoteNameIntegrityError as e:
             status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
         
-        except exceptions.users.UserInvalidError as e:
+        except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
             return error_wrapper(e, status_code)
         
-        except exceptions.users.UserPermissionError as e:
+        except UserPermissionError as e:
             status_code = status.HTTP_403_FORBIDDEN
             return error_wrapper(e, status_code)
         
-        except exceptions.DatabaseError as e:
+        except DatabaseError as e:
             logger.error(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
@@ -165,19 +174,19 @@ class NoteService(BaseService):
             status_code = status.HTTP_204_NO_CONTENT
             obj = self.usecase.delete(key=key, user_id=user_id)
         
-        except exceptions.users.UserInvalidError as e:
+        except UserInvalidError as e:
             status_code = status.HTTP_401_UNAUTHORIZED
             return error_wrapper(e, status_code)
         
-        except exceptions.users.UserPermissionError as e:
+        except UserPermissionError as e:
             status_code = status.HTTP_403_FORBIDDEN
             return error_wrapper(e, status_code)
         
-        except exceptions.notes.NoteDoesNotExistError as e:
+        except NoteDoesNotExistError as e:
             status_code = status.HTTP_404_NOT_FOUND
             return error_wrapper(e, status_code)
         
-        except exceptions.DatabaseError as e:
+        except DatabaseError as e:
             logger.error(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)

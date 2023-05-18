@@ -7,7 +7,7 @@ from core.utils.typing import (
     make_error_detail,
     ErrorDetail,
 )
-from core.data import ApiPayload
+from core.utils.data import ApiPayload
 from core.usecase import BaseUsecase
 from core.crud import CRUDMixin
 

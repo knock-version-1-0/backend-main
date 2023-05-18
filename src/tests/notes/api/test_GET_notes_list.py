@@ -4,7 +4,7 @@ from django.urls import reverse
 from tests.fixtures import auth_client_fixture
 from tests.factories.notes import make_notes
 from core.utils.exceptions import get_error_name
-from core import exceptions
+from apps.users.exceptions import UserInvalidError
 from domains.constants import MAX_NOTE_LIST_LIMIT
 
 
@@ -48,4 +48,4 @@ def test_401_UserInvalidError(auth_client_fixture):
     url = reverse('notes-list')
     response = client.get(url)
     assert response.status_code == 401
-    assert response.data['type'] == get_error_name(exceptions.users.UserInvalidError())
+    assert response.data['type'] == get_error_name(UserInvalidError())

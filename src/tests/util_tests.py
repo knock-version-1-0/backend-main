@@ -5,7 +5,7 @@ from mixer.backend.django import mixer
 from core.utils.pydantic import RequestBody
 from core.utils.typing import Empty
 from core.repository import BaseRepository
-from core.exceptions import (
+from apps.users.exceptions import (
     UserInvalidError,
 )
 from tests.fixtures.users import user_fixture

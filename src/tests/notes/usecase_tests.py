@@ -7,9 +7,11 @@ from tests.fixtures.users import (
     user_fixture,
 )
 from tests.factories.notes import make_notes, create_note_name
-from core.exceptions import (
-    UserInvalidError,
+from apps.notes.exceptions import (
     NoteDoesNotExistError,
+)
+from apps.users.exceptions import (
+    UserInvalidError,
 )
 from core.models import StatusChoice
 from di.notes_factory import NoteFactory

@@ -10,8 +10,10 @@ from domains.interfaces.notes_repository import (
 )
 from core.exceptions import (
     DatabaseError,
+)
+from apps.notes.exceptions import (
     NoteDoesNotExistError,
-    NoteNameIntegrityError,
+    NoteNameIntegrityError
 )
 from core.models import StatusChoice
 from domains.constants import MAX_NOTE_LIST_LIMIT

@@ -4,7 +4,9 @@ from django.urls import reverse
 from tests.fixtures import auth_client_fixture
 from tests.fixtures.notes import note_factory_fixture
 from core.utils.exceptions import get_error_name
-from core import exceptions
+from apps.notes.exceptions import (
+    NoteNameIntegrityError,
+)
 from adapters.dto.notes_dto import NoteReqDto
 from core.models import StatusChoice
 
@@ -40,4 +42,4 @@ def test_400_NoteNameIntegrityError(auth_client_fixture):
     response = client.post(url, req_dto.query_dict(), format='json')
 
     assert response.status_code == 400
-    assert response.data['type'] == get_error_name(exceptions.notes.NoteNameIntegrityError())
+    assert response.data['type'] == get_error_name(NoteNameIntegrityError())

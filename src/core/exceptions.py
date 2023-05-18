@@ -1,6 +1,3 @@
-from .users import *
-from .notes import *
-
 from django.db.utils import DatabaseError as _DatabaseError
 
 
