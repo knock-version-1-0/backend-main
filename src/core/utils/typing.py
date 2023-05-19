@@ -1,11 +1,17 @@
-from typing import Optional
-from core.utils.data import ErrorDetail
+from typing import TypeVar, Dict, Any, TypedDict
 
 StatusCode = int
 DTO = object
-
-def make_error_detail(type: str, detail: Optional[str]=None) -> ErrorDetail:
-    return ErrorDetail(type=type, message=detail)
+ID = TypeVar('ID')
+Literal = Dict[str, Any]
 
 class Empty:
     pass
+
+
+TokenData = TypedDict('Token', {
+    'id': ID,
+    'exp': int,
+    'at': int,
+    'token_type': str
+})

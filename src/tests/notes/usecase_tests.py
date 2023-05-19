@@ -2,9 +2,13 @@ import pytest
 import uuid
 from mixer.backend.django import mixer
 from django.db.utils import IntegrityError
+from unittest.mock import Mock
 
 from tests.fixtures.users import (
     user_fixture,
+)
+from tests.fixtures.notes import (
+    note_entity_fixture
 )
 from tests.factories.notes import make_notes, create_note_name
 from apps.notes.exceptions import (
@@ -19,12 +23,17 @@ from adapters.dto.notes_dto import (
     NoteDto
 )
 from domains.constants import MAX_NOTE_LIST_LIMIT
+from domains.entities.notes_entity import (
+    NoteEntity,
+    NoteSummaryEntity,
+)
+from apps.notes.models import Note
 
 
 @pytest.mark.django_db(transaction=True)
 def test_note_name_integrity():
     """
-    Note.name shouldn't be duplicated when User update or create as same author
+    UseCase(NOTE1): Note.name shouldn't be duplicated when User update or create as same author
     """
     user = mixer.blend('users.User')
 
@@ -69,7 +78,7 @@ def test_note_name_integrity():
 @pytest.mark.django_db
 def test_note_exists():
     """
-    Note should be existed when User retrieve
+    UseCase(NOTE3): Note should be existed when User retrieve
     """
     size = 10
     user = mixer.blend('users.User')
@@ -87,7 +96,7 @@ def test_note_exists():
 @pytest.mark.django_db
 def test_note_saved():
     """
-    User retrieve only if Note.status = SAVE
+    UseCase(NOTE4): User retrieve only if Note.status = SAVE
     """
     user = mixer.blend('users.User')
     notes = make_notes(user.id, size=2)
@@ -104,10 +113,65 @@ def test_note_saved():
     repo.find_one(notes[1].displayId)
 
 
+@pytest.mark.unit
+def test_note_list_item(note_entity_fixture):
+    """
+    UseCase(NOTE6): Note list의 item은 NoteSummary입니다.
+    """
+    queryset = Mock()
+    queryset.filter.return_value = [Note(
+        display_id=note_entity_fixture.displayId,
+        name=note_entity_fixture.name,
+        status=note_entity_fixture.status,
+        id=note_entity_fixture.id
+    )]
+    repository = NoteFactory().repository
+    repository.queryset = queryset
+
+    entities = repository.find_by_author()
+    assert not isinstance(entities[0], NoteEntity)
+    assert isinstance(entities[0], NoteSummaryEntity)
+
+
+@pytest.mark.unit
+def test_note_list_limit():
+    """
+    UseCase(NOTE5): Note list max length is 12
+    """
+    queryset = Mock()
+    queryset.filter.return_value = [Note(
+        id=i+1,
+        display_id=uuid.uuid4(),
+        name=f'name{i}',
+        status=StatusChoice.SAVE,
+    ) for i in range(30)]
+
+    repository = NoteFactory().repository
+    repository.queryset = queryset
+
+    entities = repository.find_by_author({
+        'offset': 0,
+        'limit': 5
+    })
+    assert len(entities) == 5
+    
+    # limit이 MAX_NOTE_LIST_LIMIT을 초과할 경우
+    entities = repository.find_by_author({
+        'offset': 0,
+        'limit': MAX_NOTE_LIST_LIMIT + 1
+    })
+    assert len(entities) == MAX_NOTE_LIST_LIMIT
+
+    entities = repository.find_by_author({
+        'offset': 0
+    })
+    assert len(entities) == MAX_NOTE_LIST_LIMIT
+
+
 @pytest.mark.django_db
 def test_filter_name_like():
     """
-    Note list can search by name
+    UseCase(NOTE7): Note list can search by name
     """
     size = 5
     author = mixer.blend('users.User')
@@ -129,7 +193,7 @@ def test_filter_name_like():
 @pytest.mark.django_db
 def test_note_list_max_length():
     """
-    Note list max length is 12
+    UseCase(NOTE5): Note list max length is 12
     """
     assert MAX_NOTE_LIST_LIMIT == 12
     size = MAX_NOTE_LIST_LIMIT * 2
@@ -146,7 +210,7 @@ def test_note_list_max_length():
 @pytest.mark.django_db
 def test_order_by_created_desc():
     """
-    Note list is ordered by created recently
+    UseCase(NOTE8): Note list is ordered by created recently
     """
     author = mixer.blend('users.User')
 

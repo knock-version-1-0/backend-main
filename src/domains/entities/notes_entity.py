@@ -5,6 +5,7 @@ from pydantic import BaseModel, validator
 
 from apps.notes.exceptions import NoteNameLengthLimitError
 from domains.constants import NOTE_NAME_LENGTH_LIMIT
+from core.entity import BaseEntity
 
 
 class KeywordStatus(Enum):
@@ -13,7 +14,7 @@ class KeywordStatus(Enum):
     EDIT = 3
 
 
-class KeywordEntity(BaseModel):
+class KeywordEntity(BaseEntity):
     id: int
     noteId: int
     posX: int
@@ -24,7 +25,7 @@ class KeywordEntity(BaseModel):
     timestamp: int
 
 
-class NoteEntity(BaseModel):
+class NoteEntity(BaseEntity):
     id: int
     displayId: str
     authorId: int
@@ -45,7 +46,7 @@ class NoteEntity(BaseModel):
         return v
 
 
-class NoteSummaryEntity(BaseModel):
+class NoteSummaryEntity(BaseEntity):
     displayId: str
     name: str
 

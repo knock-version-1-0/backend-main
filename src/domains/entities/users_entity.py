@@ -12,9 +12,10 @@ from core.utils.jwt import generate_jwt_token
 from apps.users.exceptions import (
     AttemptLimitOver
 )
+from core.entity import BaseEntity
 
 
-class AuthToken(JwtToken):
+class AuthTokenEntity(JwtToken):
     type: Literal['refresh', 'access']
 
     @validator('type', pre=True)
@@ -24,7 +25,7 @@ class AuthToken(JwtToken):
         raise InvalidTokenType()
 
 
-class UserEntity(BaseModel):
+class UserEntity(BaseEntity):
     id: int
     username: str
     email: str
@@ -32,27 +33,29 @@ class UserEntity(BaseModel):
     isStaff: bool
 
     @property
-    def refreshToken(self) -> 'AuthToken':
+    def refreshToken(self) -> 'AuthTokenEntity':
         if not self.isActive:
             raise AuthTokenCannotRead()
 
         _now = datetime.now()
         _exp = _now + timedelta(days=7)
-        token = generate_jwt_token(_id=self.id, _exp=int(_exp.strftime('%s')), _at=int(_now.strftime('%s')))
-        return AuthToken(type='refresh', value=token)
+        _type='refresh'
+        token = generate_jwt_token(id=self.id, exp=int(_exp.strftime('%s')), at=int(_now.strftime('%s')), type=_type)
+        return AuthTokenEntity(type=_type, value=token)
 
     @property
-    def accessToken(self) -> 'AuthToken':
+    def accessToken(self) -> 'AuthTokenEntity':
         if not self.isActive:
             raise AuthTokenCannotRead()
         
         _now = datetime.now()
         _exp = _now + timedelta(minutes=60)
-        token = generate_jwt_token(_id=self.id, _exp=int(_exp.strftime('%s')), _at=int(_now.strftime('%s')))
-        return AuthToken(type='access', value=token)
+        _type='access'
+        token = generate_jwt_token(id=self.id, exp=int(_exp.strftime('%s')), at=int(_now.strftime('%s')), type=_type)
+        return AuthTokenEntity(type=_type, value=token)
 
 
-class AuthSessionEntity(BaseModel):
+class AuthSessionEntity(BaseEntity):
     id: str
     email: str
     emailCode: str

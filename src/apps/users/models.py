@@ -74,27 +74,3 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     USERNAME_FIELD = 'username'
 
     objects = UserManager()
-
-    @property
-    def token(self):
-        """
-        Allows us to get a user's token by calling `user.token` instead of
-        `user.generate_jwt_token().
-        The `@property` decorator above makes this possible. `token` is called
-        a "dynamic property".
-        """
-        return self._generate_jwt_token()
-
-    def _generate_jwt_token(self):
-        """
-        Generates a JSON Web Token that stores this user's ID and has an expiry
-        date set to {EXPIRE_PERIOD} into the future.
-        """
-        dt = datetime.now() + settings.JWT_TOKEN_EXPIRE_PERIOD
-
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
-
-        return token

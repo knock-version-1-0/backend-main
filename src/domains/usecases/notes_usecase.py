@@ -32,29 +32,29 @@ class NoteUsecase(BaseUsecase):
             'limit': int(params.get('limit', MAX_NOTE_LIST_LIMIT))
         })
         
-        return [entity.dict() for entity in entities]
+        return [entity.literal() for entity in entities]
 
     @authorize_required
     def retrieve(self, key: str, user_id: int):
         entity = self.repository.find_one(key=key)
 
-        return entity.dict()
+        return entity.literal()
 
     @authorize_required
-    def create(self, req_body: NoteDto, user_id: int):
+    def create(self, data: NoteDto, user_id: int):
         entity = self.repository.save(
-            name=req_body.name,
-            status=req_body.status
+            name=data.name,
+            status=data.status
         )
 
-        return entity.dict()
+        return entity.literal()
 
     @authorize_required
-    def update(self, key: str, req_body: NoteDto, user_id: int) -> dict:
+    def update(self, key: str, data: NoteDto, user_id: int):
         self.repository.find_one(key=key)
-        entity = self.repository.save(**req_body.dict())
+        entity = self.repository.save(**data.dict())
 
-        return entity.dict()
+        return entity.literal()
 
     @authorize_required
     def delete(self, key: str, user_id: int):

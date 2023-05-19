@@ -1,26 +1,27 @@
 import jwt
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from django.conf import settings
 
-
-@dataclass
-class TokenData:
-    id: int
-    exp: int
-    at: int
+from core.utils.typing import ID, TokenData
 
 
-def generate_jwt_token(_id: int, _exp: int, _at: int):
+def generate_jwt_token(id: ID, exp: int, at: int, type: str):
     """
     Generates a JSON Web Token that stores this user's ID and has an expiry
     date set to {EXPIRE_PERIOD} into the future.
     """
-    data = TokenData(id=_id, exp=_exp, at=_at)
+    data: TokenData = {
+        'id': id,
+        'exp': exp,
+        'at': at,
+        'token_type': type
+    }
 
-    token = jwt.encode(asdict(data), key=settings.SECRET_KEY, algorithm='HS256')
+    token = jwt.encode(data, key=settings.SECRET_KEY, algorithm='HS256')
 
     return token
 
 
-def parse_jwt_token(jwt_: str) -> dict:
-    return jwt.decode(jwt_, settings.SECRET_KEY, algorithms=['HS256'])
+def parse_jwt_token(jwt_: str) -> TokenData:
+    data: TokenData = jwt.decode(jwt_, settings.SECRET_KEY, algorithms=['HS256'])
+    return data

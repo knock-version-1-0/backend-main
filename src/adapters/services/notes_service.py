@@ -95,13 +95,13 @@ class NoteService(BaseService):
 
         return (ApiPayload(status='OK', data=obj), status_code)
     
-    def update(self, key: str, req_body: QueryDict, user_id: int):
+    def update(self, key: str, data: QueryDict, user_id: int):
         status_code = None
         parse = lambda o: NoteDto(**o)
 
         try:
             status_code = status.HTTP_200_OK
-            obj = self.usecase.update(key=key, req_body=parse(req_body), user_id=user_id)
+            obj = self.usecase.update(key=key, data=parse(data), user_id=user_id)
         
         except ValidationError as e:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -139,7 +139,7 @@ class NoteService(BaseService):
 
         return (ApiPayload(status='OK', data=obj), status_code)
 
-    def create(self, req_body: QueryDict, user_id: int):
+    def create(self, data: QueryDict, user_id: int):
         status_code = None
         parse = lambda o: NoteDto(
             name=o['name'],
@@ -148,7 +148,7 @@ class NoteService(BaseService):
 
         try:
             status_code = status.HTTP_201_CREATED
-            obj = self.usecase.create(req_body=parse(req_body), user_id=user_id)
+            obj = self.usecase.create(data=parse(data), user_id=user_id)
         
         except ValidationError as e:
             status_code = status.HTTP_400_BAD_REQUEST

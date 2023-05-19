@@ -13,6 +13,9 @@ from apps.users.exceptions import (
     UserInvalidError,
     UserPermissionError,
 )
+from domains.entities.users_entity import (
+    UserEntity,
+)
 
 
 @pytest.mark.django_db
@@ -59,7 +62,14 @@ def test_403_UserPermissionError(auth_client_fixture):
     note = make_notes(author_id=user.id, size=1)[0]
 
     other = get_user_model().objects.create_user(username='other')
-    set_credential(client, token=other.token)
+    other_entity = UserEntity(
+        id=other.pk,
+        username=other.username,
+        email='other.email@email.com',
+        isActive=other.is_active,
+        isStaff=other.is_staff
+    )
+    set_credential(client, token=other_entity.accessToken.value)
     
     url = reverse('notes-detail', args=[note.displayId])
     response = client.get(url)

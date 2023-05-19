@@ -18,6 +18,7 @@ from apps.users.exceptions import (
 from core.models import StatusChoice
 from adapters.dto.notes_dto import NoteDto
 from domains.constants import NOTE_NAME_LENGTH_LIMIT
+from domains.entities.users_entity import UserEntity
 
 
 @pytest.mark.django_db
@@ -131,7 +132,14 @@ def test_403_UserPermissionError(auth_client_fixture):
     note = make_notes(author_id=user.id, size=1)[0]
 
     other = get_user_model().objects.create_user('other')
-    set_credential(client, token=other.token)
+    other_entity = UserEntity(
+        id=other.pk,
+        username=other.username,
+        email='other.email@email.com',
+        isActive=other.is_active,
+        isStaff=other.is_staff
+    )
+    set_credential(client, token=other_entity.accessToken.value)
 
     changed_name = 'note_changed_name'
     req_dto = NoteDto(name=changed_name)

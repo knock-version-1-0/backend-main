@@ -17,20 +17,25 @@ def _get_random_email_code():
 
 
 class AuthUseCase(BaseUsecase):
-    __period = timedelta(seconds=330)
+    __auth_session_period = timedelta(seconds=330)
 
     @classmethod
     def validate_auth_session_period(cls, auth_session: AuthSessionEntity):
-        assert auth_session.exp - auth_session.at == int(cls.__period.total_seconds())
+        period = cls.get_auth_session_period()
+        assert auth_session.exp - auth_session.at == int(period.total_seconds())
 
     @classmethod
     def generate_auth_session(cls, email: str, at: int):
-
+        period = cls.get_auth_session_period()
         return AuthSessionEntity(
             id=uuid.uuid4(),
             email=email,
             emailCode=_get_random_email_code(),
-            exp=at + int(cls.__period.total_seconds()),
+            exp=at + int(period.total_seconds()),
             at=at,
             attempt=1
         )
+    
+    @classmethod
+    def get_auth_session_period(cls) -> timedelta:
+        return cls.__auth_session_period

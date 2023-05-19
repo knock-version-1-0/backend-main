@@ -35,7 +35,7 @@ class NoteController(BaseController):
     
     def update(self, request: HttpRequest, key: str) -> Response:
         display_id = key
-        payload, status = self.service.update(key=display_id, req_body=request.data, user_id=request.user.pk)
+        payload, status = self.service.update(key=display_id, data=request.data, user_id=request.user.pk)
 
         return Response(asdict(payload), status=status)
     

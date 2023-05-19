@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from typing import List
 
 from domains.entities.notes_entity import (
@@ -9,6 +10,10 @@ from tests.fixtures.notes import (
     note_entity_fixture,
     note_summary_entity_fixture
 )
+from apps.notes.exceptions import (
+    NoteNameLengthLimitError
+)
+from domains.constants import NOTE_NAME_LENGTH_LIMIT
 
 
 @pytest.mark.unit
@@ -80,3 +85,28 @@ def test_note_summary_consistency(note_summary_entity_fixture):
     
     assert isinstance(summary.displayId, str)
     assert isinstance(summary.name, str)
+
+
+@pytest.mark.unit
+def test_note_name_length_limit():
+    """
+    Entity(NOTE1): Note.name max_length == 25
+    """
+    note = NoteEntity(
+        id=1,
+        displayId=uuid.uuid4(),
+        authorId=1,
+        name='name',
+        keywords=[],
+        status=1
+    )
+
+    with pytest.raises(NoteNameLengthLimitError):
+        note = NoteEntity(
+            id=1,
+            displayId=uuid.uuid4(),
+            authorId=1,
+            name='n' * (NOTE_NAME_LENGTH_LIMIT+1),
+            keywords=[],
+            status=1
+        )

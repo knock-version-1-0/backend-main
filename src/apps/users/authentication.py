@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import authentication, exceptions, status
 from django.utils.translation import gettext_lazy as _
 
+from core.utils.jwt import parse_jwt_token
+
 
 class JWTTokenExpired(exceptions.APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
@@ -77,7 +79,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         successful, return the user and token. If not, throw an error.
         """
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            payload = parse_jwt_token(token)
         except:
             msg = 'Invalid authentication. Could not decode token.'
             raise exceptions.AuthenticationFailed(msg)

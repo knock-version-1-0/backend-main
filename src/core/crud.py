@@ -9,10 +9,10 @@ class CRUDMixin:
     def retrieve(self, key: object, **variables) -> Any:
         raise NotImplementedError()
 
-    def create(self, req_body: object, **variables) -> Any:
+    def create(self, data: object, **variables) -> Any:
         raise NotImplementedError()
 
-    def update(self, key: object, req_body: object, **variables) -> Any:
+    def update(self, key: object, data: object, **variables) -> Any:
         raise NotImplementedError()
     
     def delete(self, key: object, **variables) -> None:
