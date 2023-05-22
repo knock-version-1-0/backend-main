@@ -6,7 +6,8 @@ from django.db import IntegrityError
 from django.db import transaction
 
 from domains.interfaces.notes_repository import (
-    NoteRepository as NoteRepositoryInterface
+    NoteRepository as NoteRepositoryInterface,
+    NoteRepositoryContext
 )
 from core.exceptions import (
     DatabaseError,
@@ -29,7 +30,7 @@ class NoteRepository(NoteRepositoryInterface):
         .prefetch_related('keywords__parent')\
         .filter(status=StatusChoice.SAVE)
     
-    def __init__(self, context: dict):
+    def __init__(self, context: NoteRepositoryContext):
         self.NoteEntity = context['NoteEntity']
         self.KeywordEntity = context['KeywordEntity']
         self.NoteSummaryEntity = context['NoteSummaryEntity']
@@ -127,6 +128,7 @@ class NoteRepository(NoteRepositoryInterface):
         try:
             self.check_permission(note.author_only)
             note.delete()
+            self.set_model_instance(None)
 
         except Exception as e:
             raise DatabaseError(e)

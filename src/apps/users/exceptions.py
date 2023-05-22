@@ -42,3 +42,10 @@ class AttemptLimitOver(Exception):
     error_type = BadRequest
     def __init__(self, *args):
         super().__init__(self.message, *args)
+
+
+class EmailSendFailed(Exception):
+    message = "Email을 보내지 못했습니다. Server의 system connection을 점검해주세요."
+    error_type = Exception
+    def __init__(self, *args):
+        super().__init__(self.message, *args)

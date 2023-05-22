@@ -1,5 +1,4 @@
 import jwt
-from dataclasses import dataclass
 from django.conf import settings
 
 from core.utils.typing import ID, TokenData

@@ -18,7 +18,7 @@ class NoteListViewSet(viewsets.ViewSet):
         )
 
 
-class NoteDetailViewset(viewsets.ViewSet):
+class NoteDetailViewSet(viewsets.ViewSet):
     controller = None
     lookup_field = 'display_id'
 

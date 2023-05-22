@@ -72,10 +72,11 @@ class AuthSessionEntity(BaseEntity):
     @validator('exp', 'at', pre=True)
     def str_to_int(cls, v):
         if isinstance(v, str):
-            return int(str)
+            return int(v)
         return v
 
     @validator('attempt')
     def check_attempt(cls, v):
         if v > 3:
             raise AttemptLimitOver()
+        return v

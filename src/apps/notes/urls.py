@@ -1,4 +1,3 @@
-# chat/urls.py
 from core.routers import Router
 
 from django.urls import path, include
@@ -13,7 +12,7 @@ router.register(
 )
 
 router.register(
-    '', views.NoteDetailViewset, basename='notes', factory=NoteFactory()
+    '', views.NoteDetailViewSet, basename='notes', factory=NoteFactory()
 )
 
 

@@ -1,13 +1,23 @@
-import logging
-import uuid
 from datetime import timedelta
 
 from django.utils.crypto import get_random_string
 
 from core.usecase import BaseUsecase
+from core.utils.typing import Literal
 from domains.entities.users_entity import (
     AuthSessionEntity
 )
+from adapters.dto.users_dto import (
+    AuthEmailDto,
+    AuthSessionDto
+)
+from domains.interfaces.users_repository import (
+    AuthRepository
+)
+
+__all__ = [
+    'AuthUseCase',
+]
 
 
 def _get_random_email_code():
@@ -19,21 +29,38 @@ def _get_random_email_code():
 class AuthUseCase(BaseUsecase):
     __auth_session_period = timedelta(seconds=330)
 
+    def __init__(self, repository: AuthRepository):
+        self.repository = repository
+
+    def send_email(self, data: AuthEmailDto) -> Literal:
+        entity = self.repository.find_by_email(data.email)
+        if entity:
+            self.repository.delete()
+
+        auth_session_dto = self.generate_auth_session_data(data.email, data.at)
+        self.repository.send_email(
+            email=auth_session_dto.email,
+            code=auth_session_dto.emailCode
+        )
+        entity = self.repository.save(
+            **auth_session_dto.dict()
+        )
+        return entity.literal()
+
     @classmethod
     def validate_auth_session_period(cls, auth_session: AuthSessionEntity):
         period = cls.get_auth_session_period()
         assert auth_session.exp - auth_session.at == int(period.total_seconds())
 
     @classmethod
-    def generate_auth_session(cls, email: str, at: int):
+    def generate_auth_session_data(cls, email: str, at: int):
         period = cls.get_auth_session_period()
-        return AuthSessionEntity(
-            id=uuid.uuid4(),
+        return AuthSessionDto(
             email=email,
             emailCode=_get_random_email_code(),
             exp=at + int(period.total_seconds()),
             at=at,
-            attempt=1
+            attempt=0
         )
     
     @classmethod
