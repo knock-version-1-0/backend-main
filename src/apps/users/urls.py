@@ -15,5 +15,5 @@ router.register(
 
 
 urlpatterns = [
-    path('auth/email-send/', include(router.urls))
+    path('auth/email-send/', include(router.urls)),
 ]

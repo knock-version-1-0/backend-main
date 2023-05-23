@@ -62,4 +62,3 @@ def note_summary_entity_fixture() -> NoteSummaryEntity:
 @pytest.fixture(scope='session')
 def note_factory_fixture() -> NoteFactory:
     return NoteFactory()
-

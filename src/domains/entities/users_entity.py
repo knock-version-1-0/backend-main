@@ -1,9 +1,9 @@
-from pydantic import BaseModel, validator
+from pydantic import validator
+from dataclasses import dataclass
 from typing import Literal
 import uuid
 from datetime import timedelta, datetime
 
-from core.utils.data import JwtToken
 from apps.users.exceptions import (
     InvalidTokenType,
     AuthTokenCannotRead
@@ -15,14 +15,17 @@ from apps.users.exceptions import (
 from core.entity import BaseEntity
 
 
-class AuthTokenEntity(JwtToken):
+@dataclass
+class AuthTokenEntity:
     type: Literal['refresh', 'access']
+    value: str
 
-    @validator('type', pre=True)
-    def check_type_name(cls, v):
-        if v == 'refresh' or v == 'access':
-            return v
-        raise InvalidTokenType()
+    def __post_init__(self):
+        self.check_type_name()
+
+    def check_type_name(self):
+        if self.type not in ('refresh', 'access'):
+            raise InvalidTokenType()
 
 
 class UserEntity(BaseEntity):
@@ -33,7 +36,7 @@ class UserEntity(BaseEntity):
     isStaff: bool
 
     @property
-    def refreshToken(self) -> 'AuthTokenEntity':
+    def refreshToken(self):
         if not self.isActive:
             raise AuthTokenCannotRead()
 
@@ -44,7 +47,7 @@ class UserEntity(BaseEntity):
         return AuthTokenEntity(type=_type, value=token)
 
     @property
-    def accessToken(self) -> 'AuthTokenEntity':
+    def accessToken(self):
         if not self.isActive:
             raise AuthTokenCannotRead()
         

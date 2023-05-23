@@ -20,8 +20,3 @@ Data = TypeVar('Data')
 class ApiPayload:
     status: str
     data: Data
-
-
-class JwtToken(BaseEntity):
-    type: str
-    value: str

@@ -33,17 +33,13 @@ class AuthUseCase(BaseUsecase):
         self.repository = repository
 
     def send_email(self, data: AuthEmailDto) -> Literal:
-        entity = self.repository.find_by_email(data.email)
-        if entity:
-            self.repository.delete()
-
         auth_session_dto = self.generate_auth_session_data(data.email, data.at)
-        self.repository.send_email(
-            email=auth_session_dto.email,
-            code=auth_session_dto.emailCode
-        )
         entity = self.repository.save(
             **auth_session_dto.dict()
+        )
+        self.repository.send_email(
+            email=entity.email,
+            code=entity.emailCode
         )
         return entity.literal()
 

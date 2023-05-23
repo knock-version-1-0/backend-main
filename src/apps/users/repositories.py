@@ -3,8 +3,6 @@ from django.core.mail import EmailMessage, get_connection
 from django.conf import settings
 from django.db import transaction
 
-from domains.entities.users_entity import AuthSessionEntity
-
 from .models import (
     AuthSession,
 )
@@ -61,7 +59,8 @@ class AuthRepository(AuthRepositoryInterface):
             pass
         else:
             with transaction.atomic():
-                instance = AuthSession.objects.create(**kwargs)
+                _qs = self.queryset.filter(email=kwargs['email']).delete()
+                instance = self.queryset.create(**kwargs)
         
         return self.AuthSessionEntity(
             id=instance.pk,
