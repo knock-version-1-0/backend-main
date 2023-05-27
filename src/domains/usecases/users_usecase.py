@@ -9,10 +9,15 @@ from domains.entities.users_entity import (
 )
 from adapters.dto.users_dto import (
     AuthEmailDto,
-    AuthSessionDto
+    AuthSessionDto,
+    AuthVerificationDto
 )
 from domains.interfaces.users_repository import (
     AuthRepository
+)
+from apps.users.exceptions import (
+    EmailSendFailed,
+    AuthenticationFailed
 )
 
 __all__ = [
@@ -37,11 +42,18 @@ class AuthUseCase(BaseUsecase):
         entity = self.repository.save(
             **auth_session_dto.dict()
         )
-        self.repository.send_email(
+        status = self.repository.send_email(
             email=entity.email,
             code=entity.emailCode
         )
+        self.validate_email_transfer(status)
+
         return entity.literal()
+
+    @classmethod
+    def validate_email_transfer(cls, status):
+        if status != 1:
+            raise EmailSendFailed()
 
     @classmethod
     def validate_auth_session_period(cls, auth_session: AuthSessionEntity):
@@ -62,3 +74,8 @@ class AuthUseCase(BaseUsecase):
     @classmethod
     def get_auth_session_period(cls) -> timedelta:
         return cls.__auth_session_period
+    
+    @classmethod
+    def validate_email_code_input(cls, auth_session: AuthSessionEntity, auth_verification: AuthVerificationDto):
+        if auth_session.emailCode != auth_verification.emailCode:
+            raise AuthenticationFailed()

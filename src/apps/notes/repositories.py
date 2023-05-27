@@ -91,8 +91,7 @@ class NoteRepository(NoteRepositoryInterface):
             self.check_permission(note.author_only)
 
             try:
-                with transaction.atomic():
-                    note.update(**kwargs)
+                note.update(**kwargs)
 
             except IntegrityError:
                 raise NoteNameIntegrityError()
@@ -102,11 +101,10 @@ class NoteRepository(NoteRepositoryInterface):
 
         else:
             try:
-                with transaction.atomic():
-                    note = Note.objects.create(
-                        author=self.user,
-                        **kwargs
-                    )
+                note = Note.objects.create(
+                    author=self.user,
+                    **kwargs
+                )
 
             except IntegrityError:
                 raise NoteNameIntegrityError()

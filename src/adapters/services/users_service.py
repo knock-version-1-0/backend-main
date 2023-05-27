@@ -14,7 +14,7 @@ from domains.usecases.users_usecase import (
 )
 from apps.users.exceptions import (
     EmailSendFailed,
-    EmailValidationError,
+    EmailAddrValidationError,
 )
 from core.exceptions import (
     DatabaseError,
@@ -45,7 +45,7 @@ class AuthService(BaseService):
             status_code = status.HTTP_200_OK
             obj = self.usecase.send_email(data=parse(data))
         
-        except EmailValidationError as e:
+        except EmailAddrValidationError as e:
             status_code = status.HTTP_400_BAD_REQUEST
             return error_wrapper(e, status_code)
 

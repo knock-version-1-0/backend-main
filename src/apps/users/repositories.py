@@ -10,9 +10,6 @@ from domains.interfaces.users_repository import (
     AuthRepository as AuthRepositoryInterface,
     AuthRepositoryContext,
 )
-from apps.users.exceptions import (
-    EmailSendFailed,
-)
 from core.exceptions import DatabaseError
 
 EMAIL_HOST = settings.EMAIL_HOST
@@ -48,15 +45,13 @@ class AuthRepository(AuthRepositoryInterface):
                 connection=connection
             )
             email_message.content_subtype = 'html'
-            status = email_message.send()
-            if status != 1:
-                raise EmailSendFailed()
+            return email_message.send()
     
     def save(self, **kwargs) -> None:
         instance: AuthSession = self.get_model_instance()
 
         if bool(instance):
-            pass
+            instance.update(**kwargs)
         else:
             with transaction.atomic():
                 _qs = self.queryset.filter(email=kwargs['email']).delete()

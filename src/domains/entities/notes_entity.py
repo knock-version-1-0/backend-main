@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional
 import uuid
-from pydantic import BaseModel, validator
+from pydantic import validator
 
 from apps.notes.exceptions import NoteNameLengthLimitError
 from domains.constants import NOTE_NAME_LENGTH_LIMIT

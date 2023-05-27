@@ -30,7 +30,7 @@ class AuthTokenCannotRead(Exception):
         super().__init__(self.message, *args)
 
 
-class EmailValidationError(Exception):
+class EmailAddrValidationError(Exception):
     message = "Email is invalid. Please check your email"
     error_type = ValidationError
     def __init__(self, *args):
@@ -46,6 +46,13 @@ class AttemptLimitOver(Exception):
 
 class EmailSendFailed(Exception):
     message = "Email을 보내지 못했습니다. Server의 system connection을 점검해주세요."
+    error_type = Exception
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
+class AuthenticationFailed(Exception):
+    message = "Failed authentication"
     error_type = Exception
     def __init__(self, *args):
         super().__init__(self.message, *args)

@@ -1,8 +1,5 @@
-import jwt
 import uuid
-from datetime import datetime
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import (
@@ -11,8 +8,9 @@ from django.contrib.auth.models import (
 
 from core.models import TimestampedModel
 from apps.users.exceptions import (
-    EmailValidationError
+    EmailAddrValidationError
 )
+from core.utils.typing import Empty
 
 # Create your models here.
 
@@ -36,9 +34,17 @@ class AuthSession(models.Model):
             super().save(*args, **kwargs)
         except ValidationError as e:
             if 'email' in e.error_dict:
-                raise EmailValidationError
+                raise EmailAddrValidationError
             else:
                 raise e
+    
+    def update(self, **kwargs):
+        update_fields = []
+        for key, value in kwargs.items():
+            if not isinstance(value, Empty):
+                setattr(self, key, value)
+                update_fields.append(key)
+        self.save(update_fields=update_fields)
 
 
 class UserManager(BaseUserManager):

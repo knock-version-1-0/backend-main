@@ -10,10 +10,10 @@ from di.users_factory import (
 router = Router()
 
 router.register(
-    '', views.EmailSendViewSet, basename='auth-email-send', factory=AuthFactory()
+    '', views.EmailSendViewSet, basename='auth-email', factory=AuthFactory()
 )
 
 
 urlpatterns = [
-    path('auth/email-send/', include(router.urls)),
+    path('auth/email/', include(router.urls)),
 ]
