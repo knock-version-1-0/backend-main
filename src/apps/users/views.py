@@ -11,3 +11,13 @@ class EmailSendViewSet(viewsets.ViewSet):
         return self.controller.send_email(
             request=request
         )
+
+
+class UserListViewSet(viewsets.ViewSet):
+    controller = None
+    authentication_classes = []
+
+    def create(self, request: HttpRequest) -> Response:
+        return self.controller.create(
+            request=request
+        )

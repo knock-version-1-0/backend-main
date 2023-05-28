@@ -24,10 +24,10 @@ class BaseService:
     def retrieve(self, key: object, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
 
-    def create(self, req_body: object, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
+    def create(self, data: QueryDict, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
 
-    def update(self, key: object, req_body: object, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
+    def update(self, key: object, data: QueryDict, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
     
     def delete(self, key: object, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:

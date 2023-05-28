@@ -1,5 +1,8 @@
+import uuid
 import pytest
 from typing import Tuple
+from datetime import datetime
+
 from rest_framework.test import APIClient
 
 from apps.users.models import User
@@ -7,6 +10,11 @@ from domains.entities.users_entity import (
     UserEntity,
     AuthSessionEntity,
 )
+from adapters.dto.users_dto import (
+    AuthEmailDto,
+    AuthVerificationDto
+)
+from tests.factories.users import email, timestamp, make_users
 
 
 @pytest.fixture
@@ -22,7 +30,7 @@ def user_entity_fixture() -> UserEntity:
         username='user_name',
         isActive=True,
         isStaff=False,
-        email='user_name@email.com'
+        email=email
     )
 
 
@@ -33,14 +41,26 @@ def set_credential(client, token):
 @pytest.fixture
 def auth_client_fixture() -> Tuple[APIClient, User, set_credential]:
     client = APIClient()
-    user = User.objects.create_user('fixture_user')
-    user_entity = UserEntity(
-        id=user.pk,
-        username=user.username,
-        email='user.email@email.com',
-        isActive=user.is_active,
-        isStaff=user.is_staff
-    )
-    set_credential(client, user_entity.accessToken.value)
+    user_entity = make_users(size=1)
 
-    return (client, user, set_credential)
+    set_credential(client, user_entity[0].accessToken.value)
+
+    return (client, User.objects.get(pk=user_entity[0].id), set_credential)
+
+
+@pytest.fixture
+def auth_email_dto_fixture() -> AuthEmailDto:
+    return AuthEmailDto(
+        email=email,
+        at=timestamp
+    )
+
+
+@pytest.fixture
+def auth_verification_dto_fixture() -> AuthVerificationDto:
+    return AuthVerificationDto(
+        id=uuid.uuid4(),
+        email=email,
+        emailCode='660011',
+        currentTime=timestamp
+    )

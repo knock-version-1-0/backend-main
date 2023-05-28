@@ -5,11 +5,8 @@ from core.controller import BaseController
 
 from adapters.services.users_service import (
     AuthService,
+    UserService
 )
-
-__all__ = [
-    'AuthService',
-]
 
 
 class AuthController(BaseController):
@@ -19,5 +16,16 @@ class AuthController(BaseController):
     
     def send_email(self, request: HttpRequest) -> Response:
         payload, status = self.service.send_email(request.data)
+
+        return Response(asdict(payload), status=status)
+
+
+class UserController(BaseController):
+
+    def __init__(self, service: UserService):
+        self.service = service
+    
+    def create(self, request: HttpRequest) -> Response:
+        payload, status = self.service.create(request.data)
 
         return Response(asdict(payload), status=status)

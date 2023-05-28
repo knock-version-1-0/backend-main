@@ -1,6 +1,7 @@
 import logging
-from typing import Optional
-from core.utils.data import ApiPayload
+
+from rest_framework.request import QueryDict
+from core.utils.data import ApiPayload, ErrorDetail
 
 from django.http.request import QueryDict
 from rest_framework import status
@@ -8,9 +9,11 @@ from core.service import BaseService, error_wrapper
 
 from adapters.dto.users_dto import (
     AuthEmailDto,
+    UserDto
 )
 from domains.usecases.users_usecase import (
-    AuthUseCase,
+    AuthUsecase,
+    UserUsecase
 )
 from apps.users.exceptions import (
     EmailSendFailed,
@@ -31,7 +34,7 @@ __all__ = [
 
 class AuthService(BaseService):
 
-    def __init__(self, usecase: AuthUseCase):
+    def __init__(self, usecase: AuthUsecase):
         self.usecase = usecase
     
     def send_email(self, data: QueryDict):
@@ -59,4 +62,26 @@ class AuthService(BaseService):
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
+        return (ApiPayload(status='CREATED', data=obj), status_code)
+
+
+class UserService(BaseService):
+    def __init__(self, usecase: UserUsecase):
+        self.usecase = usecase
+
+    def create(self, data: QueryDict, **variables):
+        status_code = None
+        parse = lambda o: UserDto(
+            email=o['email']
+        )
+
+        try:
+            status_code = status.HTTP_201_CREATED
+            obj = self.usecase.create(parse(data))
+        
+        except Exception as e:
+            logger.debug(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+
         return (ApiPayload(status='CREATED', data=obj), status_code)

@@ -1,6 +1,7 @@
 import uuid
 
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -31,10 +32,11 @@ class AuthSession(models.Model):
     
     def save(self, *args, **kwargs):
         try:
+            self.full_clean()
             super().save(*args, **kwargs)
         except ValidationError as e:
             if 'email' in e.error_dict:
-                raise EmailAddrValidationError
+                raise EmailAddrValidationError()
             else:
                 raise e
     
@@ -80,3 +82,11 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     USERNAME_FIELD = 'username'
 
     objects = UserManager()
+
+    def update(self, **kwargs):
+        update_fields = []
+        for key, value in kwargs.items():
+            if not isinstance(value, Empty):
+                setattr(self, key, value)
+                update_fields.append(key)
+        self.save(update_fields=update_fields)

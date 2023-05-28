@@ -36,3 +36,7 @@ class AuthVerificationDto(RequestBody):
 class AuthEmailDto(RequestBody):
     email: str
     at: int
+
+
+class UserDto(RequestBody):
+    email: str

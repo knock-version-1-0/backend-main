@@ -1,1 +1,1 @@
-from knock.settings.base import *
+from knock.settings.test import *

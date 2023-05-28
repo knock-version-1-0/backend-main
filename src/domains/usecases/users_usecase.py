@@ -10,19 +10,17 @@ from domains.entities.users_entity import (
 from adapters.dto.users_dto import (
     AuthEmailDto,
     AuthSessionDto,
-    AuthVerificationDto
+    AuthVerificationDto,
+    UserDto
 )
 from domains.interfaces.users_repository import (
-    AuthRepository
+    AuthRepository,
+    UserRepository
 )
 from apps.users.exceptions import (
     EmailSendFailed,
     AuthenticationFailed
 )
-
-__all__ = [
-    'AuthUseCase',
-]
 
 
 def _get_random_email_code():
@@ -31,7 +29,7 @@ def _get_random_email_code():
     return get_random_string(length, allowed_chars)
 
 
-class AuthUseCase(BaseUsecase):
+class AuthUsecase(BaseUsecase):
     __auth_session_period = timedelta(seconds=330)
 
     def __init__(self, repository: AuthRepository):
@@ -79,3 +77,20 @@ class AuthUseCase(BaseUsecase):
     def validate_email_code_input(cls, auth_session: AuthSessionEntity, auth_verification: AuthVerificationDto):
         if auth_session.emailCode != auth_verification.emailCode:
             raise AuthenticationFailed()
+
+
+class UserUsecase(BaseUsecase):
+    def __init__(self, repository: UserRepository):
+        self.repository = repository
+
+    def create(self, data: UserDto, **variables) -> Literal:
+        entity = self.repository.find_by_email(data.email)
+
+        if not entity:
+            entity = self.repository.save(username=data.email, email=data.email)
+        
+        data: Literal = {
+            'refreshToken': entity.refreshToken.value,
+            'accessToken': entity.accessToken.value
+        }
+        return data

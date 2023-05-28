@@ -5,10 +5,13 @@ from django.db import transaction
 
 from .models import (
     AuthSession,
+    User
 )
 from domains.interfaces.users_repository import (
     AuthRepository as AuthRepositoryInterface,
     AuthRepositoryContext,
+    UserRepository as UserRepositoryInterface,
+    UserRepositoryContext
 )
 from core.exceptions import DatabaseError
 
@@ -25,7 +28,10 @@ class AuthRepository(AuthRepositoryInterface):
     def __init__(self, context: AuthRepositoryContext):
         self.AuthSessionEntity = context['AuthSessionEntity']
 
-    def send_email(self, email: str, code: int) -> None:
+    def send_email(self, email: str, code: int) -> int:
+        if settings.TEST_MODE:
+            return 1
+        
         template_path = 'email-code.html'
         context = {'code': code}
         html_message = render_to_string(template_path, context)
@@ -67,19 +73,16 @@ class AuthRepository(AuthRepositoryInterface):
         )
     
     def find_by_email(self, email: str):
-        try:
-            instance = self.queryset.get(email=email)
-            self.set_model_instance(instance)
-            return self.AuthSessionEntity(
-                id=instance.pk,
-                email=instance.email,
-                emailCode=instance.email_code,
-                exp=instance.exp,
-                at=instance.at,
-                attempt=instance.attempt
-            )
-        except AuthSession.DoesNotExist:
-            return None
+        auth_session = self.queryset.get(email=email)
+        self.set_model_instance(auth_session)
+        return self.AuthSessionEntity(
+            id=auth_session.pk,
+            email=auth_session.email,
+            emailCode=auth_session.email_code,
+            exp=auth_session.exp,
+            at=auth_session.at,
+            attempt=auth_session.attempt
+        )
     
     def delete(self) -> None:
         obj: AuthSession = self.get_model_instance()
@@ -89,3 +92,34 @@ class AuthRepository(AuthRepositoryInterface):
 
         except Exception as e:
             raise DatabaseError(e)
+
+
+class UserRepository(UserRepositoryInterface):
+    queryset = User.objects.filter(is_active=True)
+
+    def __init__(self, context: UserRepositoryContext, **kwargs):
+        self.UserEntity = context['UserEntity']
+
+    def find_by_email(self, email: str):
+        try:
+            user: User = self.queryset.get(email=email)
+            self.set_model_instance(user)
+            return self.UserEntity(
+                id=user.pk,
+                username=user.username,
+                email=user.email,
+                isActive=user.is_active,
+                isStaff=user.is_staff
+            )
+        except User.DoesNotExist:
+            return None
+
+    def save(self, **kwargs):
+        user: User = User.objects.create_user(**kwargs)
+        return self.UserEntity(
+            id=user.pk,
+            username=user.username,
+            email=user.email,
+            isActive=user.is_active,
+            isStaff=user.is_staff
+        )
