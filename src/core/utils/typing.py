@@ -3,7 +3,7 @@ from typing import TypeVar, Dict, Any, TypedDict
 StatusCode = int
 DTO = object
 ID = TypeVar('ID')
-Literal = Dict[str, Any]
+LiteralData = Dict[str, Any]
 
 class Empty:
     pass

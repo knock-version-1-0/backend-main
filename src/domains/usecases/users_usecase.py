@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils.crypto import get_random_string
 
 from core.usecase import BaseUsecase
-from core.utils.typing import Literal
+from core.utils.typing import LiteralData
 from domains.entities.users_entity import (
     AuthSessionEntity
 )
@@ -35,7 +35,7 @@ class AuthUsecase(BaseUsecase):
     def __init__(self, repository: AuthRepository):
         self.repository = repository
 
-    def send_email(self, data: AuthEmailDto) -> Literal:
+    def send_email(self, data: AuthEmailDto) -> LiteralData:
         auth_session_dto = self.generate_auth_session_data(data.email, data.at)
         entity = self.repository.save(
             **auth_session_dto.dict()
@@ -83,13 +83,13 @@ class UserUsecase(BaseUsecase):
     def __init__(self, repository: UserRepository):
         self.repository = repository
 
-    def create(self, data: UserDto, **variables) -> Literal:
+    def create(self, data: UserDto, **variables) -> LiteralData:
         entity = self.repository.find_by_email(data.email)
 
         if not entity:
             entity = self.repository.save(username=data.email, email=data.email)
         
-        data: Literal = {
+        data: LiteralData = {
             'refreshToken': entity.refreshToken.value,
             'accessToken': entity.accessToken.value
         }

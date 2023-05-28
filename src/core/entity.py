@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 
-from core.utils.typing import Literal
+from core.utils.typing import LiteralData
 
 
 class BaseEntity(BaseModel):
-    def literal(self) -> Literal:
-        _literal: Literal = self.dict()
+    def literal(self) -> LiteralData:
+        _literal: LiteralData = self.dict()
         return _literal
