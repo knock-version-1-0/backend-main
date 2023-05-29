@@ -3,14 +3,6 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 
-from core.utils.exceptions import get_error_name
-from apps.users.exceptions import (
-    EmailAddrValidationError
-)
-from domains.entities.users_entity import (
-    AuthSessionEntity
-)
-
 
 @pytest.mark.django_db
 def test_201_CREATED():

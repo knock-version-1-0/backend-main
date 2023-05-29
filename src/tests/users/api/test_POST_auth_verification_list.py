@@ -15,7 +15,6 @@ from apps.users.exceptions import (
 from adapters.dto.users_dto import (
     AuthVerificationDto
 )
-from di.users_factory import AuthFactory
 from domains.entities.users_entity import AuthSessionEntity
 
 

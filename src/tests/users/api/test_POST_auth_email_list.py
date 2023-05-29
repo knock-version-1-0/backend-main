@@ -3,8 +3,9 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 
-from tests.fixtures import (
-    auth_email_dto_fixture
+from tests.factories.users import (
+    email,
+    timestamp
 )
 from core.utils.exceptions import get_error_name
 from apps.users.exceptions import (
@@ -13,6 +14,14 @@ from apps.users.exceptions import (
 from adapters.dto.users_dto import (
     AuthEmailDto
 )
+
+
+@pytest.fixture(scope='module')
+def auth_email_dto_fixture() -> AuthEmailDto:
+    return AuthEmailDto(
+        email=email,
+        at=timestamp
+    )
 
 
 @pytest.mark.django_db
