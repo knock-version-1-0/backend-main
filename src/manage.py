@@ -7,7 +7,18 @@ import sys
 def main():
     """Run administrative tasks."""
     ENV = os.environ.get('SERVICE_ENV')
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'knock.settings.prod' if ENV=='PROD' else 'knock.settings')
+
+    settings_module = None
+    if ENV == 'PROD':
+        settings_module = 'knock.settings.prod'
+    elif ENV == 'DEV':
+        settings_module = 'knock.settings'
+    elif ENV == 'LOCAL':
+        settings_module = 'knock.settings.local'
+    else:
+        raise RuntimeError('SERVICE_ENV variable in env file is invalid.')
+    
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

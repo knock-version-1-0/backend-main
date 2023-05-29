@@ -11,7 +11,6 @@ from core.utils.data import (
     ApiPayload
 )
 from core.usecase import BaseUsecase
-from core.crud import CRUDMixin
 
 
 class BaseService:
