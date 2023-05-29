@@ -18,6 +18,11 @@ class AuthController(BaseController):
         payload, status = self.service.send_email(request.data)
 
         return Response(asdict(payload), status=status)
+    
+    def verify(self, request: HttpRequest) -> Response:
+        payload, status = self.service.verify(request.data)
+
+        return Response(asdict(payload), status=status)
 
 
 class UserController(BaseController):

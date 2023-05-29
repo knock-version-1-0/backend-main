@@ -29,7 +29,7 @@ def test_200_OK(auth_email_dto_fixture):
 
 
 @pytest.mark.django_db
-def test_400_BAD_REQUEST(auth_email_dto_fixture):
+def test_400_EmailAddrValidationError(auth_email_dto_fixture):
     client = APIClient()
     dto: AuthEmailDto = auth_email_dto_fixture
     dto = dto.copy(update={'email': 'invalidemail'})

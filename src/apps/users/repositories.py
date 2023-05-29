@@ -2,6 +2,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage, get_connection
 from django.conf import settings
 from django.db import transaction
+from django.core.exceptions import ValidationError
 
 from .models import (
     AuthSession,
@@ -14,6 +15,10 @@ from domains.interfaces.users_repository import (
     UserRepositoryContext
 )
 from core.exceptions import DatabaseError
+from apps.users.exceptions import (
+    AuthSessionDoesNotExist,
+    EmailAddrValidationError
+)
 
 EMAIL_HOST = settings.EMAIL_HOST
 EMAIL_PORT = settings.EMAIL_PORT
@@ -55,13 +60,22 @@ class AuthRepository(AuthRepositoryInterface):
     
     def save(self, **kwargs) -> None:
         instance: AuthSession = self.get_model_instance()
+        try:
+            if bool(instance):
+                instance.update(**kwargs)
+            else:
+                with transaction.atomic():
+                    _qs = self.queryset.filter(email=kwargs['email']).delete()
+                    instance = self.queryset.create(**kwargs)
 
-        if bool(instance):
-            instance.update(**kwargs)
-        else:
-            with transaction.atomic():
-                _qs = self.queryset.filter(email=kwargs['email']).delete()
-                instance = self.queryset.create(**kwargs)
+        except ValidationError as e:
+            if 'email' in e.error_dict:
+                raise EmailAddrValidationError()
+            else:
+                raise e
+
+        except Exception as e:
+            raise DatabaseError(e)
         
         return self.AuthSessionEntity(
             id=instance.pk,
@@ -72,17 +86,23 @@ class AuthRepository(AuthRepositoryInterface):
             attempt=instance.attempt
         )
     
-    def find_by_email(self, email: str):
-        auth_session = self.queryset.get(email=email)
-        self.set_model_instance(auth_session)
-        return self.AuthSessionEntity(
-            id=auth_session.pk,
-            email=auth_session.email,
-            emailCode=auth_session.email_code,
-            exp=auth_session.exp,
-            at=auth_session.at,
-            attempt=auth_session.attempt
-        )
+    def find_by_id(self, id: str, *args, **kwargs):
+        try:
+            auth_session = self.queryset.get(id=id)
+            self.set_model_instance(auth_session)
+            return self.AuthSessionEntity(
+                id=auth_session.pk,
+                email=auth_session.email,
+                emailCode=auth_session.email_code,
+                exp=auth_session.exp,
+                at=auth_session.at,
+                attempt=auth_session.attempt
+            )
+        except AuthSession.DoesNotExist:
+            raise AuthSessionDoesNotExist()
+        
+        except Exception as e:
+            raise DatabaseError(e)
     
     def delete(self) -> None:
         obj: AuthSession = self.get_model_instance()

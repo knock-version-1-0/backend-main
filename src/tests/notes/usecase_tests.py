@@ -1,7 +1,6 @@
 import pytest
 import uuid
 from mixer.backend.django import mixer
-from django.db.utils import IntegrityError
 from unittest.mock import Mock
 
 from tests.fixtures.users import (
@@ -13,9 +12,7 @@ from tests.fixtures.notes import (
 from tests.factories.notes import make_notes, create_note_name
 from apps.notes.exceptions import (
     NoteDoesNotExistError,
-)
-from apps.users.exceptions import (
-    UserInvalidError,
+    NoteNameIntegrityError
 )
 from core.models import StatusChoice
 from di.notes_factory import NoteFactory
@@ -46,7 +43,7 @@ def test_note_name_integrity():
 
     note = note_list[0]
 
-    with pytest.raises(IntegrityError):
+    with pytest.raises(NoteNameIntegrityError):
         dto = NoteDto(
             name=note.name,
             status=StatusChoice.SAVE
@@ -62,7 +59,7 @@ def test_note_name_integrity():
     # update
     repo.find_one(key=note_list[size-1].displayId)
 
-    with pytest.raises(IntegrityError):
+    with pytest.raises(NoteNameIntegrityError):
         dto = NoteDto(
             name=note.name
         )

@@ -10,7 +10,12 @@ from domains.entities.users_entity import (
 )
 from apps.users.exceptions import (
     EmailSendFailed,
-    AuthenticationFailed
+    AuthenticationFailed,
+    AuthSessionDoesNotExist,
+    AuthSessionExpired
+)
+from tests.fixtures.users import (
+    email
 )
 
 
@@ -60,3 +65,34 @@ def test_email_code_input_validation():
     auth_verification = Mock(emailCode=uuid.uuid4())
     with pytest.raises(AuthenticationFailed):
         AuthUsecase.validate_email_code_input(auth_session, auth_verification)
+
+
+@pytest.mark.unit
+def test_session_data_email_validation():
+    """
+    UseCase(USER4): session id에 해당하는 session data 내의 email이 같은지 검증해야 합니다.
+    """
+    auth_session = Mock(email=email)
+    auth_verification = Mock(email=email)
+
+    AuthUsecase.validate_session_data_email(auth_session, auth_verification)
+
+    auth_verification = Mock(email='other' + email)
+    with pytest.raises(AuthSessionDoesNotExist):
+        AuthUsecase.validate_session_data_email(auth_session, auth_verification)
+
+
+@pytest.mark.unit
+def test_session_data_expired():
+    """
+    UseCase(USER5): AuthSession의 기간이 만료되었는지 여부를 검증해야 합니다.
+    """
+    exp = int(datetime.now().strftime('%s'))
+    auth_session = Mock(exp=exp)
+    auth_verification = Mock(currentTime=exp-1)
+
+    AuthUsecase.validate_session_expired(auth_session, auth_verification)
+
+    auth_verification = Mock(currentTime=exp+1)
+    with pytest.raises(AuthSessionExpired):
+        AuthUsecase.validate_session_expired(auth_session, auth_verification)

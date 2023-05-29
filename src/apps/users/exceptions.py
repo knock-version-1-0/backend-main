@@ -1,5 +1,5 @@
 from rest_framework.exceptions import PermissionDenied
-from django.core.exceptions import BadRequest, ValidationError
+from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist
 
 
 class UserInvalidError(Exception):
@@ -54,5 +54,19 @@ class EmailSendFailed(Exception):
 class AuthenticationFailed(Exception):
     message = "Failed authentication"
     error_type = Exception
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
+class AuthSessionExpired(Exception):
+    message = "Auth session is expired"
+    error_type = BadRequest
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
+class AuthSessionDoesNotExist(Exception):
+    message = "해당 session이 존재하지 않거나 올바르지 않은 email입니다."
+    error_type = ObjectDoesNotExist
     def __init__(self, *args):
         super().__init__(self.message, *args)

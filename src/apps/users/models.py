@@ -31,14 +31,8 @@ class AuthSession(models.Model):
         return str(self.id)
     
     def save(self, *args, **kwargs):
-        try:
-            self.full_clean()
-            super().save(*args, **kwargs)
-        except ValidationError as e:
-            if 'email' in e.error_dict:
-                raise EmailAddrValidationError()
-            else:
-                raise e
+        self.full_clean()
+        super().save(*args, **kwargs)
     
     def update(self, **kwargs):
         update_fields = []

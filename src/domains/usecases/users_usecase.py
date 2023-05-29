@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.utils.crypto import get_random_string
 
@@ -19,7 +19,10 @@ from domains.interfaces.users_repository import (
 )
 from apps.users.exceptions import (
     EmailSendFailed,
-    AuthenticationFailed
+    AuthenticationFailed,
+    AuthSessionDoesNotExist,
+    AuthSessionExpired,
+    AttemptLimitOver
 )
 
 
@@ -47,6 +50,24 @@ class AuthUsecase(BaseUsecase):
         self.validate_email_transfer(status)
 
         return entity.literal()
+    
+    def verify(self, data: AuthVerificationDto) -> LiteralData:
+        entity = self.repository.find_by_id(id=data.id)
+        self.validate_session_data_email(entity, data)
+        self.validate_session_expired(entity, data)
+
+        try:
+            self.validate_email_code_input(entity, data)
+        except AuthenticationFailed as e:
+            if entity.attempt == 3:
+                self.repository.delete()
+                raise AttemptLimitOver()
+            self.repository.save(attempt=entity.attempt + 1)
+            raise e
+
+        self.repository.delete()
+        ret: LiteralData = {}
+        return ret
 
     @classmethod
     def validate_email_transfer(cls, status):
@@ -66,7 +87,7 @@ class AuthUsecase(BaseUsecase):
             emailCode=_get_random_email_code(),
             exp=at + int(period.total_seconds()),
             at=at,
-            attempt=0
+            attempt=1
         )
     
     @classmethod
@@ -77,6 +98,17 @@ class AuthUsecase(BaseUsecase):
     def validate_email_code_input(cls, auth_session: AuthSessionEntity, auth_verification: AuthVerificationDto):
         if auth_session.emailCode != auth_verification.emailCode:
             raise AuthenticationFailed()
+    
+    @classmethod
+    def validate_session_data_email(cls, auth_session: AuthSessionEntity, auth_verification: AuthVerificationDto):
+        if auth_session.email != auth_verification.email:
+            raise AuthSessionDoesNotExist()
+    
+    @classmethod
+    def validate_session_expired(cls, auth_session: AuthSessionEntity, auth_verification: AuthVerificationDto):
+        exp = auth_session.exp
+        if auth_verification.currentTime > exp:
+            raise AuthSessionExpired()
 
 
 class UserUsecase(BaseUsecase):

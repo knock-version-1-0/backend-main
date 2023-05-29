@@ -9,7 +9,8 @@ from core.service import BaseService, error_wrapper
 
 from adapters.dto.users_dto import (
     AuthEmailDto,
-    UserDto
+    UserDto,
+    AuthVerificationDto
 )
 from domains.usecases.users_usecase import (
     AuthUsecase,
@@ -18,6 +19,10 @@ from domains.usecases.users_usecase import (
 from apps.users.exceptions import (
     EmailSendFailed,
     EmailAddrValidationError,
+    AttemptLimitOver,
+    AuthSessionExpired,
+    AuthenticationFailed,
+    AuthSessionDoesNotExist
 )
 from core.exceptions import (
     DatabaseError,
@@ -62,7 +67,48 @@ class AuthService(BaseService):
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
-        return (ApiPayload(status='CREATED', data=obj), status_code)
+        return (ApiPayload(status='OK', data=obj), status_code)
+    
+    def verify(self, data: QueryDict):
+        status_code = None
+        parse = lambda o: AuthVerificationDto(
+            id=o['id'],
+            email=o['email'],
+            emailCode=o['emailCode'],
+            currentTime=o['currentTime']
+        )
+
+        try:
+            status_code = status.HTTP_200_OK
+            obj = self.usecase.verify(data=parse(data))
+        
+        except AttemptLimitOver as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+        
+        except AuthSessionExpired as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+        
+        except AuthenticationFailed as e:
+            status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except AuthSessionDoesNotExist as e:
+            status_code = status.HTTP_404_NOT_FOUND
+            return error_wrapper(e, status_code)
+        
+        except DatabaseError as e:
+            logger.debug(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+        
+        except Exception as e:
+            logger.error(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+        
+        return (ApiPayload(status='OK', data=obj), status_code)
 
 
 class UserService(BaseService):

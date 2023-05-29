@@ -5,8 +5,9 @@ from datetime import datetime
 from core.models import StatusChoice
 from domains.entities.users_entity import (
     UserEntity,
+    AuthSessionEntity
 )
-from di.users_factory import UserFactory
+from di.users_factory import UserFactory, AuthFactory
 
 fake = faker.Faker()
 
@@ -25,3 +26,18 @@ def make_users(size=5) -> List[UserEntity]:
         ))
 
     return users
+
+
+def make_auth_sessions(size=5) -> List[AuthSessionEntity]:
+    factory = AuthFactory()
+    repository = factory.repository
+    usecase = factory.usecase
+
+    auth_sessions = []
+    for _ in range(size):
+        dto = usecase.generate_auth_session_data(email, timestamp)
+        auth_sessions.append(repository.save(
+            **dto.dict()
+        ))
+    
+    return auth_sessions
