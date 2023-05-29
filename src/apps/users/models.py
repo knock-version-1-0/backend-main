@@ -1,16 +1,11 @@
 import uuid
 
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 
 from core.models import TimestampedModel
-from apps.users.exceptions import (
-    EmailAddrValidationError
-)
 from core.utils.typing import Empty
 
 # Create your models here.
