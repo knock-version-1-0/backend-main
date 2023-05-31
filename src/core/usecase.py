@@ -16,7 +16,7 @@ class BaseUsecase(CRUDMixin):
     def retrieve(self, key: object, **variables) -> LiteralData:
         raise NotImplementedError()
     
-    def create(self, data: object, **variables) -> LiteralData:
+    def create(self, dto: object, **variables) -> LiteralData:
         raise NotImplementedError()
     
     def update(self, key: object, data: object, **variables) -> LiteralData:

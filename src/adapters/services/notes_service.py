@@ -101,7 +101,7 @@ class NoteService(BaseService):
 
         try:
             status_code = status.HTTP_200_OK
-            obj = self.usecase.update(key=key, data=parse(data), user_id=user_id)
+            obj = self.usecase.update(key=key, dto=parse(data), user_id=user_id)
         
         except ValidationError as e:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -148,7 +148,7 @@ class NoteService(BaseService):
 
         try:
             status_code = status.HTTP_201_CREATED
-            obj = self.usecase.create(data=parse(data), user_id=user_id)
+            obj = self.usecase.create(dto=parse(data), user_id=user_id)
         
         except ValidationError as e:
             status_code = status.HTTP_400_BAD_REQUEST

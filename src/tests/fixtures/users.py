@@ -1,13 +1,21 @@
 import pytest
 from typing import Tuple
+import uuid
 
 from rest_framework.test import APIClient
 
 from apps.users.models import User
 from domains.entities.users_entity import (
     UserEntity,
+    AuthSessionEntity,
+    AuthTokenEntity
 )
-from tests.factories.users import email, make_users
+from tests.factories.users import (
+    email,
+    make_users,
+    emailCode,
+    timestamp
+)
 
 
 @pytest.fixture
@@ -24,6 +32,34 @@ def user_entity_fixture() -> UserEntity:
         isActive=True,
         isStaff=False,
         email=email
+    )
+
+
+@pytest.fixture
+def auth_session_entity_fixture() -> AuthSessionEntity:
+    return AuthSessionEntity(
+        id=uuid.uuid4(),
+        email=email,
+        emailCode=emailCode,
+        exp=timestamp + int(AuthSessionEntity.get_expire_period().total_seconds()),
+        at=timestamp,
+        attempt=0
+    )
+
+
+@pytest.fixture
+def refresh_token_entity_fixture(user_entity_fixture) -> AuthTokenEntity:
+    return AuthTokenEntity(
+        type='refresh',
+        value=user_entity_fixture.refreshToken.value
+    )
+
+
+@pytest.fixture
+def access_token_entity_fixture(user_entity_fixture) -> AuthTokenEntity:
+    return AuthTokenEntity(
+        type='access',
+        value=user_entity_fixture.accessToken.value
     )
 
 

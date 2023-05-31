@@ -10,10 +10,12 @@ from core.service import BaseService, error_wrapper
 from adapters.dto.users_dto import (
     AuthEmailDto,
     UserDto,
-    AuthVerificationDto
+    AuthVerificationDto,
+    AuthTokenDto
 )
 from domains.usecases.users_usecase import (
-    AuthUsecase,
+    AuthSessionUsecase,
+    AuthTokenUsecase,
     UserUsecase
 )
 from apps.users.exceptions import (
@@ -22,7 +24,10 @@ from apps.users.exceptions import (
     AttemptLimitOver,
     AuthSessionExpired,
     AuthenticationFailed,
-    AuthSessionDoesNotExist
+    AuthSessionDoesNotExist,
+    RefreshTokenExpired,
+    RefreshTokenRequired,
+    UserInvalidError
 )
 from core.exceptions import (
     DatabaseError,
@@ -32,14 +37,10 @@ from core.exceptions import (
 
 logger = logging.getLogger(__name__)
 
-__all__ = [
-    'AuthService',
-]
 
+class AuthSessionService(BaseService):
 
-class AuthService(BaseService):
-
-    def __init__(self, usecase: AuthUsecase):
+    def __init__(self, usecase: AuthSessionUsecase):
         self.usecase = usecase
     
     def send_email(self, data: QueryDict):
@@ -51,7 +52,7 @@ class AuthService(BaseService):
 
         try:
             status_code = status.HTTP_200_OK
-            obj = self.usecase.send_email(data=parse(data))
+            obj = self.usecase.send_email(dto=parse(data))
         
         except EmailAddrValidationError as e:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -80,7 +81,7 @@ class AuthService(BaseService):
 
         try:
             status_code = status.HTTP_200_OK
-            obj = self.usecase.verify(data=parse(data))
+            obj = self.usecase.verify(dto=parse(data))
         
         except AttemptLimitOver as e:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -108,6 +109,42 @@ class AuthService(BaseService):
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
         
+        return (ApiPayload(status='OK', data=obj), status_code)
+
+
+class AuthTokenService(BaseService):
+    def __init__(self, usecase: AuthTokenUsecase):
+        self.usecase = usecase
+    
+    def create(self, data: QueryDict, max_age: int):
+        status_code = None
+        parse = lambda o: AuthTokenDto(
+            type=o['type'],
+            value=o['value']
+        )
+
+        try:
+            status_code = status.HTTP_200_OK
+            obj = self.usecase.create(parse(data), max_age=max_age)
+        
+        except RefreshTokenRequired as e:
+            logger.info(e)
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+        
+        except RefreshTokenExpired as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            return error_wrapper(e, status_code)
+        
+        except UserInvalidError as e:
+            status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except Exception as e:
+            logger.error(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+
         return (ApiPayload(status='OK', data=obj), status_code)
 
 

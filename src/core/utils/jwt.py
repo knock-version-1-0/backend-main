@@ -2,6 +2,7 @@ import jwt
 from django.conf import settings
 
 from core.utils.typing import ID, TokenData
+from core.exceptions import ExpiredSignatureError
 
 
 def generate_jwt_token(id: ID, exp: int, at: int, type: str):
@@ -22,5 +23,8 @@ def generate_jwt_token(id: ID, exp: int, at: int, type: str):
 
 
 def parse_jwt_token(jwt_: str) -> TokenData:
-    data: TokenData = jwt.decode(jwt_, settings.SECRET_KEY, algorithms=['HS256'])
+    try:
+        data: TokenData = jwt.decode(jwt_, settings.SECRET_KEY, algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        raise ExpiredSignatureError()
     return data

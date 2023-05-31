@@ -23,6 +23,16 @@ class AuthVerificationViewSet(viewsets.ViewSet):
         )
 
 
+class AuthTokenViewSet(viewsets.ViewSet):
+    controller = None
+    authentication_classes = []
+
+    def create(self, request: HttpRequest) -> Response:
+        return self.controller.create(
+            request=request
+        )
+
+
 class UserListViewSet(viewsets.ViewSet):
     controller = None
     authentication_classes = []

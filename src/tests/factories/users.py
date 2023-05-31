@@ -7,12 +7,13 @@ from domains.entities.users_entity import (
     UserEntity,
     AuthSessionEntity
 )
-from di.users_factory import UserFactory, AuthFactory
+from di.users_factory import UserFactory, AuthSessionFactory
 
 fake = faker.Faker()
 
 email = 'user_name@email.com'
 timestamp = int(datetime.now().strftime('%s'))
+emailCode = '000000'
 
 
 def make_users(size=5) -> List[UserEntity]:
@@ -29,7 +30,7 @@ def make_users(size=5) -> List[UserEntity]:
 
 
 def make_auth_sessions(size=5) -> List[AuthSessionEntity]:
-    factory = AuthFactory()
+    factory = AuthSessionFactory()
     repository = factory.repository
     usecase = factory.usecase
 

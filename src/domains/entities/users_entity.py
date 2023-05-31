@@ -1,14 +1,16 @@
 from pydantic import validator
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Literal
 import uuid
 from datetime import timedelta, datetime
+
+from core.utils.typing import LiteralData
+from core.utils.jwt import generate_jwt_token
 
 from apps.users.exceptions import (
     InvalidTokenType,
     AuthTokenCannotRead
 )
-from core.utils.jwt import generate_jwt_token
 from apps.users.exceptions import (
     AttemptLimitOver
 )
@@ -26,6 +28,10 @@ class AuthTokenEntity:
     def check_type_name(self):
         if self.type not in ('refresh', 'access'):
             raise InvalidTokenType()
+    
+    def literal(self) -> LiteralData:
+        ret: LiteralData = asdict(self)
+        return ret
 
 
 class UserEntity(BaseEntity):
@@ -83,3 +89,6 @@ class AuthSessionEntity(BaseEntity):
         if v > 3:
             raise AttemptLimitOver()
         return v
+    
+    def get_expire_period() -> timedelta:
+        return timedelta(seconds=330)

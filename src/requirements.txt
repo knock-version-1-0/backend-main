@@ -11,3 +11,4 @@ PyJWT
 mixer
 pydantic==1.10.5
 factory_boy
+python-memcached

@@ -18,6 +18,11 @@ class AuthSessionDto(RequestBody):
         }
 
 
+class AuthTokenDto(RequestBody):
+    type: str
+    value: str
+
+
 class AuthVerificationDto(RequestBody):
     id: str
     email: str

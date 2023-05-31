@@ -41,18 +41,18 @@ class NoteUsecase(BaseUsecase):
         return entity.literal()
 
     @authorize_required
-    def create(self, data: NoteDto, user_id: int):
+    def create(self, dto: NoteDto, user_id: int):
         entity = self.repository.save(
-            name=data.name,
-            status=data.status
+            name=dto.name,
+            status=dto.status
         )
 
         return entity.literal()
 
     @authorize_required
-    def update(self, key: str, data: NoteDto, user_id: int):
+    def update(self, key: str, dto: NoteDto, user_id: int):
         self.repository.find_one(key=key)
-        entity = self.repository.save(**data.dict())
+        entity = self.repository.save(**dto.dict())
 
         return entity.literal()
 

@@ -6,6 +6,9 @@ class UserInvalidError(Exception):
     message = "User invalid"
     error_type = Exception
     def __init__(self, *args):
+        """
+        유효하지 않은 유저에 대한 요청입니다.
+        """
         super().__init__(self.message, *args)
 
 
@@ -68,5 +71,19 @@ class AuthSessionExpired(Exception):
 class AuthSessionDoesNotExist(Exception):
     message = "해당 session이 존재하지 않거나 올바르지 않은 email입니다."
     error_type = ObjectDoesNotExist
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
+class RefreshTokenExpired(Exception):
+    message = "refresh token is expired please authenticate user."
+    error_type = BadRequest
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
+class RefreshTokenRequired(Exception):
+    message = "Refresh token is required in request body"
+    error_type = BadRequest
     def __init__(self, *args):
         super().__init__(self.message, *args)

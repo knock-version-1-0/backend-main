@@ -9,6 +9,9 @@ from domains.entities.users_entity import (
 )
 from tests.fixtures.users import (
     user_entity_fixture,
+    auth_session_entity_fixture,
+    refresh_token_entity_fixture,
+    access_token_entity_fixture
 )
 from core.utils.jwt import parse_jwt_token
 from apps.users.exceptions import (
@@ -20,6 +23,14 @@ from apps.users.exceptions import (
 
 @pytest.mark.unit
 def test_user_entity(user_entity_fixture):
+    """ yaml
+    User:
+        id: integer
+        username: string
+        isActive: boolean
+        isStaff: boolean
+        email: string
+    """
     user: UserEntity = user_entity_fixture
 
     assert isinstance(user.id, int)
@@ -27,6 +38,44 @@ def test_user_entity(user_entity_fixture):
     assert isinstance(user.email, str)
     assert isinstance(user.isActive, bool)
     assert isinstance(user.isStaff, bool)
+
+
+@pytest.mark.unit
+def test_auth_session_entity(auth_session_entity_fixture):
+    """ yaml
+    AuthSession:
+        id: string
+        emailCode: string
+        exp: integer
+        at: integer
+        email: string
+        attempt: integer
+    """
+    auth_session: AuthSessionEntity = auth_session_entity_fixture
+
+    assert isinstance(auth_session.id, str)
+    assert isinstance(auth_session.emailCode, str)
+    assert isinstance(auth_session.exp, int)
+    assert isinstance(auth_session.at, int)
+    assert isinstance(auth_session.email, str)
+    assert isinstance(auth_session.attempt, int)
+
+
+@pytest.mark.unit
+def test_auth_token_entity(refresh_token_entity_fixture, access_token_entity_fixture):
+    """ yaml
+    AuthToken:
+        type:
+            - 'refresh'
+            - 'access'
+        value: string
+    """
+    refresh_token: AuthTokenEntity = refresh_token_entity_fixture
+    access_token: AuthTokenEntity = access_token_entity_fixture
+
+    assert refresh_token.type == 'refresh'
+    assert access_token.type == 'access'
+    assert isinstance(refresh_token.value, str)
 
 
 @pytest.mark.unit
@@ -126,3 +175,11 @@ def test_auth_token_type_validation():
 
     token = AuthTokenEntity(type='access', value='asdjfewvcx')
     assert token.type == 'access'
+
+
+@pytest.mark.unit
+def test_auth_session_expire_period():
+    """
+    Entity(USER7): AuthSession의 만료기간은 330초 입니다.
+    """
+    assert int(AuthSessionEntity.get_expire_period().total_seconds()) == 330
