@@ -16,8 +16,8 @@ down:
 	docker rmi api/main
 
 clean:
-	docker stop api_main socket_db postgres cache_default
-	docker rm api_main socket_db postgres cache_default
+	docker stop api_main redis postgres cache_default
+	docker rm api_main redis postgres cache_default
 	docker rmi api/main redis:latest postgres:14.2 memcached:latest
 
 restart:

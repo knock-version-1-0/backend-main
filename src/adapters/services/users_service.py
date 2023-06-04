@@ -1,7 +1,7 @@
 import logging
 
 from rest_framework.request import QueryDict
-from core.utils.data import ApiPayload, ErrorDetail
+from core.utils.data import ApiPayload
 
 from django.http.request import QueryDict
 from rest_framework import status
@@ -165,6 +165,6 @@ class UserService(BaseService):
         except Exception as e:
             logger.debug(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return error_wrapper(e, status_code)
+            return error_wrapper(DatabaseError(e), status_code)
 
         return (ApiPayload(status='CREATED', data=obj), status_code)

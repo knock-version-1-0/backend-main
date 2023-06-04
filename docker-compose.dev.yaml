@@ -15,9 +15,10 @@ services:
             ./entrypoint.sh"
     ports:
       - "8000:8000"
+    restart: always
     depends_on:
       - db
-      - socket_db
+      - redis
       - cache_default
 
   db:
@@ -31,11 +32,11 @@ services:
       - ./scripts/db-init.sh:/scripts/db-init.sh
       - ./db/sql:/sql
   
-  socket_db:
+  redis:
     image: redis:latest
-    container_name: socket_db
+    container_name: redis
     ports:
-      - "6371:6379"
+      - "6379:6379"
   
   cache_default:
     image: memcached:latest

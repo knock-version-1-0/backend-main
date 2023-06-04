@@ -1,9 +1,7 @@
-from datetime import timedelta, datetime
-
 from django.utils.crypto import get_random_string
 
 from core.usecase import BaseUsecase
-from core.utils.typing import LiteralData, TokenData
+from core.utils.typing import LiteralData
 from core.utils.jwt import parse_jwt_token
 from domains.entities.users_entity import (
     AuthSessionEntity

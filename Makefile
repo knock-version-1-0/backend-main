@@ -11,8 +11,8 @@ down-prod:
 	docker-compose -f docker-compose.prod.yaml down --remove-orphans
 
 clean:
-	docker stop api_main postgres nginx socket_db cache_default
-	docker rm api_main postgres nginx socket_db cache_default
+	docker stop api_main postgres nginx redis cache_default
+	docker rm api_main postgres nginx redis cache_default
 	docker rmi api/main nginx:latest postgres:14.2 memcached:latest redis:latest
 
 shell-db:

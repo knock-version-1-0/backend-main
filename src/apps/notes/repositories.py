@@ -3,7 +3,6 @@ from .models import (
     Keyword,
 )
 from django.db import IntegrityError
-from django.db import transaction
 
 from domains.interfaces.notes_repository import (
     NoteRepository as NoteRepositoryInterface,
