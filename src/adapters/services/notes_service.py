@@ -216,15 +216,7 @@ class KeywordService(BaseService):
     
     def create(self, data: QueryDict, **variables):
         status_code = None
-        parse = lambda o: KeywordDto(
-            noteId=o['noteId'],
-            posX=o['posX'],
-            posY=o['posY'],
-            text=o['text'],
-            parentId=o['parentId'],
-            status=o['status'],
-            timestamp=o['timestamp']
-        )
+        parse = lambda o: KeywordDto(**data)
 
         try:
             status_code = status.HTTP_200_OK
