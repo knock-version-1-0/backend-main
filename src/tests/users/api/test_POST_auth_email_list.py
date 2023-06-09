@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 
-from tests.factories.users import (
+from tests.factories.utils import (
     email,
     timestamp
 )

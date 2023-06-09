@@ -4,7 +4,7 @@ from core.service import BaseService
 from core.crud import CRUDMixin
 
 
-class BaseController(CRUDMixin):
+class HttpController(CRUDMixin):
     def __init__(self, service: BaseService):
         self.service = service
 
@@ -15,3 +15,16 @@ class BaseController(CRUDMixin):
     def create(self, request: HttpRequest) -> Response: ...
 
     def update(self, request: HttpRequest, key: object) -> Response: ...
+
+
+class WsController(CRUDMixin):
+    def __init__(self, service: BaseService):
+        self.service = service
+
+    def retrieve(self, event, key: object) -> str: ...
+
+    def list(self, event) -> str: ...
+
+    def create(self, event) -> str: ...
+
+    def update(self, event, key: object) -> str: ...

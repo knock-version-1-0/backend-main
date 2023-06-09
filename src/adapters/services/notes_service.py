@@ -1,6 +1,8 @@
 import logging
-from typing import Optional
-from core.utils.data import ApiPayload
+from typing import Optional, Tuple, Union
+
+from rest_framework.request import QueryDict
+from core.utils.data import ApiPayload, ErrorDetail
 
 from django.http.request import QueryDict
 from rest_framework import status
@@ -11,7 +13,8 @@ from adapters.dto.notes_dto import (
     KeywordDto,
 )
 from domains.usecases.notes_usecase import (
-    NoteUsecase
+    NoteUsecase,
+    KeywordUsecase
 )
 from apps.notes.exceptions import (
     NoteDoesNotExistError,
@@ -29,10 +32,6 @@ from core.exceptions import (
 
 
 logger = logging.getLogger(__name__)
-
-__all__ = [
-    'NoteService',
-]
 
 
 class NoteService(BaseService):
@@ -208,3 +207,37 @@ class NoteService(BaseService):
             return error_wrapper(e, status_code)
 
         return (ApiPayload(status='NO_CONTENT', data=obj), status_code)
+
+
+class KeywordService(BaseService):
+
+    def __init__(self, usecase: KeywordUsecase):
+        self.usecase = usecase
+    
+    def create(self, data: QueryDict, **variables):
+        status_code = None
+        parse = lambda o: KeywordDto(
+            noteId=o['noteId'],
+            posX=o['posX'],
+            posY=o['posY'],
+            text=o['text'],
+            parentId=o['parentId'],
+            status=o['status'],
+            timestamp=o['timestamp']
+        )
+
+        try:
+            status_code = status.HTTP_200_OK
+            obj = self.usecase.create(dto=parse(data))
+        
+        except NoteDoesNotExistError as e:
+            logger.error(e)
+            status_code = status.HTTP_404_NOT_FOUND
+            return error_wrapper(e, status_code)
+
+        except Exception as e:
+            logger.error(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+
+        return (ApiPayload(status='OK', data=obj), status_code)

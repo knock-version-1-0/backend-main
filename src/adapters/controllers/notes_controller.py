@@ -1,18 +1,18 @@
+import json
+
+from django.http import QueryDict
 from rest_framework.request import HttpRequest
 from rest_framework.response import Response
 from dataclasses import asdict
-from core.controller import BaseController
+from core.controller import HttpController, WsController
 
 from adapters.services.notes_service import (
     NoteService,
+    KeywordService
 )
 
-__all__ = [
-    'NoteController',
-]
 
-
-class NoteController(BaseController):
+class NoteController(HttpController):
     
     def __init__(self, service: NoteService):
         self.service = service
@@ -44,3 +44,19 @@ class NoteController(BaseController):
         payload, status = self.service.delete(key=display_id, user_id=request.user.pk)
 
         return Response(asdict(payload), status=status)
+
+
+class KeywordController(WsController):
+
+    def __init__(self, service: KeywordService):
+        self.service = service
+    
+    def create(self, event) -> str:
+        message = event["message"]
+        data = json.loads(message)
+        query_dict = QueryDict('', mutable=True)
+        query_dict.update(data)
+
+        payload, _ = self.service.create(query_dict)
+
+        return json.dumps(asdict(payload))

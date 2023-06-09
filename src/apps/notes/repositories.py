@@ -1,12 +1,15 @@
+from domains.entities.notes_entity import KeywordEntity
 from .models import (
     Note,
     Keyword,
 )
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from domains.interfaces.notes_repository import (
     NoteRepository as NoteRepositoryInterface,
-    NoteRepositoryContext
+    NoteRepositoryContext,
+    KeywordRepository as KeywordRepositoryInterface,
+    KeywordRepositoryContext
 )
 from core.exceptions import (
     DatabaseError,
@@ -17,10 +20,6 @@ from apps.notes.exceptions import (
 )
 from core.models import StatusChoice
 from domains.constants import MAX_NOTE_LIST_LIMIT
-
-__all__ = [
-    'NoteRepository',
-]
 
 
 class NoteRepository(NoteRepositoryInterface):
@@ -129,3 +128,37 @@ class NoteRepository(NoteRepositoryInterface):
 
         except Exception as e:
             raise DatabaseError(e)
+
+
+class KeywordRepository(KeywordRepositoryInterface):
+
+    def __init__(self, context: KeywordRepositoryContext):
+        self.KeywordEntity = context['KeywordEntity']
+    
+    def save(self, **kwargs) -> KeywordEntity:
+        with transaction.atomic():
+            note_id = kwargs.pop('note_id')
+            try:
+                note = Note.objects.get(pk=note_id)
+            except Note.DoesNotExist:
+                raise NoteDoesNotExistError()
+
+            parent_id = kwargs.pop('parent_id')
+            parent = None if not parent_id else Keyword.objects.get(pk=parent_id)
+
+            keyword = Keyword.objects.create(
+                note=note,
+                parent=parent,
+                **kwargs
+            )
+
+        return self.KeywordEntity(
+            id=keyword.pk,
+            noteId=note_id,
+            posX=keyword.pos_x,
+            posY=keyword.pos_y,
+            text=keyword.text,
+            parentId=parent_id,
+            status=keyword.status,
+            timestamp=keyword.timestamp
+        )

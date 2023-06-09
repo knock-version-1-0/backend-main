@@ -8,12 +8,13 @@ from domains.entities.users_entity import (
     AuthSessionEntity
 )
 from di.users_factory import UserFactory, AuthSessionFactory
+from .utils import (
+    email,
+    emailCode,
+    timestamp
+)
 
 fake = faker.Faker()
-
-email = 'user_name@email.com'
-timestamp = int(datetime.now().strftime('%s'))
-emailCode = '000000'
 
 
 def make_users(size=5) -> List[UserEntity]:

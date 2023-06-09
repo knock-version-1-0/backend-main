@@ -8,7 +8,10 @@ from domains.entities.notes_entity import (
     NoteSummaryEntity,
     KeywordEntity
 )
+from apps.notes.models import KeywordStatusChoice
+from adapters.dto.notes_dto import KeywordDto
 from di.notes_factory import NoteFactory
+from tests.factories.utils import timestamp
 
 fake = faker.Faker()
 
@@ -29,3 +32,15 @@ def make_notes(author_id: int, size=5) -> List[NoteEntity]:
         ))
     
     return notes
+
+
+def make_keyword_dto(note_id: int) -> KeywordDto:
+    return KeywordDto(
+        noteId=note_id,
+        posX=0,
+        posY=0,
+        text='',
+        parentId=None,
+        status=KeywordStatusChoice.UNSELECT,
+        timestamp=timestamp
+    )

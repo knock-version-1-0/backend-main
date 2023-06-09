@@ -5,7 +5,7 @@ from core.consumers import Consumer
 APP_NAME = "notes"
 
 
-class NoteUpdateKeyword(Consumer):
+class NoteUpdateKeywordConsumer(Consumer):
     app_name = APP_NAME
     key_name = "note_id"
     
@@ -16,12 +16,9 @@ class NoteUpdateKeyword(Consumer):
         await self.send(text_data=json.dumps({"status": 'OK', "data": data}))
 
 
-class NoteCreateKeyword(Consumer):
+class NoteCreateKeywordConsumer(Consumer):
     app_name = APP_NAME
     key_name = "note_id"
 
     async def notes_message(self, event):
-        message = event["message"]
-        data = json.loads(message)
-
-        await self.send(text_data=json.dumps({"status": 'OK', "data": data}))
+        await self.send(text_data=self.controller.create(event))

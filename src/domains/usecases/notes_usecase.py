@@ -1,21 +1,19 @@
-import logging
 from typing import Optional
 from rest_framework.request import QueryDict
 
 from core.utils.decorators import authorize_required
 from core.usecase import BaseUsecase
+from core.utils.typing import LiteralData
 
 from domains.interfaces.notes_repository import (
-    NoteRepository
+    NoteRepository,
+    KeywordRepository
 )
 from domains.constants import MAX_NOTE_LIST_LIMIT
-from adapters.dto.notes_dto import NoteDto
-
-logger = logging.getLogger(__name__)
-
-__all__ = [
-    'NoteUsecase',
-]
+from adapters.dto.notes_dto import (
+    NoteDto,
+    KeywordDto
+)
 
 
 class NoteUsecase(BaseUsecase):
@@ -60,3 +58,14 @@ class NoteUsecase(BaseUsecase):
     def delete(self, key: str, user_id: int):
         self.repository.find_one(key=key)
         self.repository.delete()
+
+
+class KeywordUsecase(BaseUsecase):
+
+    def __init__(self, repository: KeywordRepository):
+        self.repository = repository
+    
+    def create(self, dto: KeywordDto, **variables) -> LiteralData:
+        entity = self.repository.save(**dto.dict())
+
+        return entity.literal()

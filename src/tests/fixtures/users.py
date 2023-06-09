@@ -11,8 +11,10 @@ from domains.entities.users_entity import (
     AuthTokenEntity
 )
 from tests.factories.users import (
-    email,
     make_users,
+)
+from tests.factories.utils import (
+    email,
     emailCode,
     timestamp
 )
