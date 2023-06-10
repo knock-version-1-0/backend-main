@@ -166,6 +166,7 @@ REST_FRAMEWORK = {
         'apps.users.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'EXCEPTION_HANDLER': 'core.views.exception_handler',
 }
 
 LOGGING = {

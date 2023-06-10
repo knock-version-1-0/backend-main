@@ -5,12 +5,14 @@ from rest_framework import authentication, exceptions, status
 from django.utils.translation import gettext_lazy as _
 
 from core.utils.jwt import parse_jwt_token
+from apps.users.exceptions import UserInvalidError
+from core.utils.exceptions import get_error_name
 
 
 class JWTTokenExpired(exceptions.APIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = _('Token이 만료되었습니다.')
-    default_code = 'TOKEN_EXPIRED'
+    default_code = get_error_name(UserInvalidError())
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
@@ -80,7 +82,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             payload = parse_jwt_token(token)
         except:
             msg = 'Invalid authentication. Could not decode token.'
-            raise exceptions.AuthenticationFailed(msg)
+            raise exceptions.AuthenticationFailed(msg, get_error_name(UserInvalidError()))
         
         current_time = datetime.datetime.now().timestamp()
         if current_time > payload['exp']:

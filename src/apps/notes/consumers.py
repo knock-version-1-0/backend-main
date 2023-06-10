@@ -1,6 +1,6 @@
-import json
-
 from core.consumers import Consumer
+from core.ws.request import Request
+
 
 APP_NAME = "notes"
 
@@ -9,16 +9,18 @@ class NoteUpdateKeywordConsumer(Consumer):
     app_name = APP_NAME
     key_name = "note_id"
     
-    async def notes_message(self, event):
-        message = event["message"]
-        data = json.loads(message)
-
-        await self.send(text_data=json.dumps({"status": 'OK', "data": data}))
+    def update(self, request: Request):
+        return self.controller.update(
+            request=request,
+            key=request.key
+        )
 
 
 class NoteCreateKeywordConsumer(Consumer):
     app_name = APP_NAME
     key_name = "note_id"
 
-    async def notes_message(self, event):
-        await self.send(text_data=self.controller.create(event))
+    def create(self, request: Request):
+        return self.controller.create(
+            request=request
+        )

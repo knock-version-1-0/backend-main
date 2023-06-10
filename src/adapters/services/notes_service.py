@@ -1,8 +1,8 @@
 import logging
-from typing import Optional, Tuple, Union
+from typing import Optional
 
 from rest_framework.request import QueryDict
-from core.utils.data import ApiPayload, ErrorDetail
+from core.utils.data import ApiPayload
 
 from django.http.request import QueryDict
 from rest_framework import status
@@ -214,7 +214,7 @@ class KeywordService(BaseService):
     def __init__(self, usecase: KeywordUsecase):
         self.usecase = usecase
     
-    def create(self, data: QueryDict, **variables):
+    def create(self, data: dict, **variables):
         status_code = None
         parse = lambda o: KeywordDto(**data)
 

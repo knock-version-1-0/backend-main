@@ -17,16 +17,16 @@ class BaseService:
     def __init__(self, usecase: BaseUsecase):
         self.usecase = usecase
 
-    def list(self, params: Optional[QueryDict]=None, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
+    def list(self, params: Optional[Union[QueryDict, dict]]=None, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
 
     def retrieve(self, key: object, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
 
-    def create(self, data: QueryDict, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
+    def create(self, data: Union[QueryDict, dict], **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
 
-    def update(self, key: object, data: QueryDict, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
+    def update(self, key: object, data: Union[QueryDict, dict], **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
         raise NotImplementedError()
     
     def delete(self, key: object, **variables) -> Tuple[Union[ApiPayload, ErrorDetail], int]:
