@@ -22,7 +22,7 @@ class NoteUsecase(BaseUsecase):
         self.repository = repository
 
     @authorize_required
-    def list(self, params: Optional[QueryDict]=None, user_id: Optional[int]=None):
+    def list(self, params: Optional[QueryDict]=None, **variables):
         params = params or QueryDict({})
         entities = self.repository.find_by_author(lookup={
             'name': params.get('name', ''),
@@ -33,13 +33,13 @@ class NoteUsecase(BaseUsecase):
         return [entity.literal() for entity in entities]
 
     @authorize_required
-    def retrieve(self, key: str, user_id: int):
+    def retrieve(self, key: str, **variables):
         entity = self.repository.find_one(key=key)
 
         return entity.literal()
 
     @authorize_required
-    def create(self, dto: NoteDto, user_id: int):
+    def create(self, dto: NoteDto, **variables):
         entity = self.repository.save(
             name=dto.name,
             status=dto.status
@@ -48,14 +48,14 @@ class NoteUsecase(BaseUsecase):
         return entity.literal()
 
     @authorize_required
-    def update(self, key: str, dto: NoteDto, user_id: int):
+    def update(self, key: str, dto: NoteDto, **variables):
         self.repository.find_one(key=key)
         entity = self.repository.save(**dto.dict())
 
         return entity.literal()
 
     @authorize_required
-    def delete(self, key: str, user_id: int):
+    def delete(self, key: str, **variables):
         self.repository.find_one(key=key)
         self.repository.delete()
 
@@ -65,6 +65,7 @@ class KeywordUsecase(BaseUsecase):
     def __init__(self, repository: KeywordRepository):
         self.repository = repository
     
+    @authorize_required
     def create(self, dto: KeywordDto, **variables) -> LiteralData:
         entity = self.repository.save(**dto.dict())
 

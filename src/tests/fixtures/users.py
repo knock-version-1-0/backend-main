@@ -14,7 +14,7 @@ from tests.factories.users import (
     make_users,
 )
 from tests.factories.utils import (
-    email,
+    get_unique_email,
     emailCode,
     timestamp
 )
@@ -33,7 +33,7 @@ def user_entity_fixture() -> UserEntity:
         username='user_name',
         isActive=True,
         isStaff=False,
-        email=email
+        email=get_unique_email()
     )
 
 
@@ -41,7 +41,7 @@ def user_entity_fixture() -> UserEntity:
 def auth_session_entity_fixture() -> AuthSessionEntity:
     return AuthSessionEntity(
         id=uuid.uuid4(),
-        email=email,
+        email=get_unique_email(),
         emailCode=emailCode,
         exp=timestamp + int(AuthSessionEntity.get_expire_period().total_seconds()),
         at=timestamp,

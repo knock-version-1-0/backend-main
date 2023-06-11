@@ -3,7 +3,7 @@ from core.ws.request import Request as WsRequest
 from rest_framework.response import Response as HttpResponse
 from core.ws.response import Response as WsResponse
 from dataclasses import asdict
-from core.controller import HttpController, WsController
+from core.controller import BaseController
 
 from adapters.services.notes_service import (
     NoteService,
@@ -11,7 +11,7 @@ from adapters.services.notes_service import (
 )
 
 
-class NoteController(HttpController):
+class NoteController(BaseController):
     
     def __init__(self, service: NoteService):
         self.service = service
@@ -45,12 +45,12 @@ class NoteController(HttpController):
         return HttpResponse(asdict(payload), status=status)
 
 
-class KeywordController(WsController):
+class KeywordController(BaseController):
 
     def __init__(self, service: KeywordService):
         self.service = service
     
     def create(self, request: WsRequest) -> WsResponse:
-        payload, status = self.service.create(data=request.data)
+        payload, status = self.service.create(data=request.data, user_id=request.user.pk)
 
         return WsResponse(asdict(payload), status=status)

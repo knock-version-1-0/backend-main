@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status as http_status
 from dataclasses import asdict
 
-from core.controller import HttpController
+from core.controller import BaseController
 
 from adapters.services.users_service import (
     AuthSessionService,
@@ -14,7 +14,7 @@ from core.views import parse_max_age
 from core.utils.data import ErrorDetail
 
 
-class AuthSessionController(HttpController):
+class AuthSessionController(BaseController):
 
     def __init__(self, service: AuthSessionService):
         self.service = service
@@ -30,7 +30,7 @@ class AuthSessionController(HttpController):
         return Response(asdict(payload), status=status)
 
 
-class AuthTokenController(HttpController):
+class AuthTokenController(BaseController):
 
     def __init__(self, service: AuthTokenService):
         self.service = service
@@ -59,7 +59,7 @@ class AuthTokenController(HttpController):
         return response
 
 
-class UserController(HttpController):
+class UserController(BaseController):
 
     def __init__(self, service: UserService):
         self.service = service

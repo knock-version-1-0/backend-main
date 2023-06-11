@@ -3,7 +3,6 @@ from typing import (
 )
 from pydantic import validate_model, BaseModel
 from pydantic.error_wrappers import ValidationError
-import json
 
 from core.utils.typing import Empty
 
@@ -57,8 +56,8 @@ class RequestBody(BaseModel):
     
     def query_dict(self):
         _dict = self.__dict__
-        rst = {}
+        ret = {}
         for k, v in _dict.items():
             if not isinstance(v, Empty):
-                rst[k] = v
-        return rst
+                ret[k] = v
+        return ret

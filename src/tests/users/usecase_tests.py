@@ -16,7 +16,7 @@ from apps.users.exceptions import (
     RefreshTokenRequired
 )
 from tests.fixtures.users import (
-    email,
+    get_unique_email,
     user_entity_fixture
 )
 from di.users_factory import AuthTokenFactory
@@ -56,12 +56,13 @@ def test_session_data_email_validation():
     """
     UseCase(USER4): session id에 해당하는 session data 내의 email이 같은지 검증해야 합니다.
     """
+    email = get_unique_email()
     auth_session = Mock(email=email)
     auth_verification = Mock(email=email)
 
     AuthSessionUsecase.validate_session_data_email(auth_session, auth_verification)
 
-    auth_verification = Mock(email='other' + email)
+    auth_verification = Mock(email='other' + get_unique_email())
     with pytest.raises(AuthSessionDoesNotExist):
         AuthSessionUsecase.validate_session_data_email(auth_session, auth_verification)
 

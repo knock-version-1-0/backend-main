@@ -2,11 +2,10 @@ from typing import Optional, List
 from rest_framework.request import QueryDict
 
 from core.repository import BaseRepository
-from core.crud import CRUDMixin
 from core.utils.typing import LiteralData
 
 
-class BaseUsecase(CRUDMixin):
+class BaseUsecase:
     def __init__(self, repository: BaseRepository, context: Optional[dict]=None):
         self.repository = repository
 

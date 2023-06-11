@@ -16,7 +16,9 @@ def exception_handler(exc, context):
     response = views.exception_handler(exc, context)
 
     if response is not None:
+        response.data.pop('detail')
+
         response.data['type'] = exc.default_code
-        response.data['detail'] = exc.default_detail
+        response.data['message'] = exc.default_detail
     
     return response

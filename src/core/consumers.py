@@ -1,7 +1,7 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from core.controller import WsController
+from core.controller import BaseController
 from core.ws.request import Request
 from rest_framework.settings import api_settings
 
@@ -40,9 +40,13 @@ class BaseConsumer(AsyncWebsocketConsumer):
             handler = getattr(self, method_name, None)
             if handler:
                 request = self.get_request(event)
-                self.initial(request)
-                response = handler(request)
-                await self.send(text_data=response.text_data)
+                try:
+                    self.initial(request)
+                    response = handler(request)
+                except Exception as exc:
+                    response = self.handle_exception(exc)
+
+                await self.send(text_data=json.dumps(response.data))
                 return
         raise Exception('CRUD method is not implemented.')
 
@@ -50,6 +54,8 @@ class BaseConsumer(AsyncWebsocketConsumer):
 class Consumer(BaseConsumer):
     authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
     __crud_method_names = ['create', 'list', 'retrieve', 'update', 'delete']
+
+    settings = api_settings
     
     def get_request(self, event) -> Request:
         message = event["message"]
@@ -89,7 +95,41 @@ class Consumer(BaseConsumer):
     
     def get_crud_method_names(self):
         return self.__crud_method_names
+    
+    def get_exception_handler(self):
+        """
+        Returns the exception handler that this view uses.
+        """
+        return self.settings.EXCEPTION_HANDLER
+
+    def get_exception_handler_context(self):
+        """
+        Returns a dict that is passed through to EXCEPTION_HANDLER,
+        as the `context` argument.
+        """
+        return {
+            'view': self,
+            'args': getattr(self, 'args', ()),
+            'kwargs': getattr(self, 'kwargs', {}),
+            'request': getattr(self, 'request', None)
+        }
+    
+    def handle_exception(self, exc):
+        """
+        Handle any exception that occurs, by returning an appropriate response,
+        or re-raising the error.
+        """
+        exception_handler = self.get_exception_handler()
+
+        context = self.get_exception_handler_context()
+        response = exception_handler(exc, context)
+
+        if response is None:
+            raise exc
+
+        response.exception = True
+        return response
 
     @property
-    def controller(self) -> WsController:
+    def controller(self) -> BaseController:
         return self.factory.controller

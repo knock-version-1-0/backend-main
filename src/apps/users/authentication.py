@@ -15,6 +15,12 @@ class JWTTokenExpired(exceptions.APIException):
     default_code = get_error_name(UserInvalidError())
 
 
+class AuthenticationFailed(exceptions.APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = _('Invalid authentication. Could not decode token.')
+    default_code = get_error_name(UserInvalidError())
+
+
 class JWTAuthentication(authentication.BaseAuthentication):
     authentication_header_prefix = 'Token'
 
@@ -82,7 +88,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             payload = parse_jwt_token(token)
         except:
             msg = 'Invalid authentication. Could not decode token.'
-            raise exceptions.AuthenticationFailed(msg, get_error_name(UserInvalidError()))
+            raise AuthenticationFailed()
         
         current_time = datetime.datetime.now().timestamp()
         if current_time > payload['exp']:

@@ -214,14 +214,22 @@ class KeywordService(BaseService):
     def __init__(self, usecase: KeywordUsecase):
         self.usecase = usecase
     
-    def create(self, data: dict, **variables):
+    def create(self, data: dict, user_id: int, **variables):
         status_code = None
         parse = lambda o: KeywordDto(**data)
 
         try:
             status_code = status.HTTP_200_OK
-            obj = self.usecase.create(dto=parse(data))
+            obj = self.usecase.create(dto=parse(data), user_id=user_id)
         
+        except UserInvalidError as e:
+            status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except UserPermissionError as e:
+            status_code = status.HTTP_403_FORBIDDEN
+            return error_wrapper(e, status_code)
+
         except NoteDoesNotExistError as e:
             logger.error(e)
             status_code = status.HTTP_404_NOT_FOUND

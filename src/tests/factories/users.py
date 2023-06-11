@@ -1,15 +1,13 @@
 from typing import List
-import faker, factory
-from datetime import datetime
+import faker
 
-from core.models import StatusChoice
 from domains.entities.users_entity import (
     UserEntity,
     AuthSessionEntity
 )
 from di.users_factory import UserFactory, AuthSessionFactory
 from .utils import (
-    email,
+    get_unique_email,
     emailCode,
     timestamp
 )
@@ -23,8 +21,8 @@ def make_users(size=5) -> List[UserEntity]:
     users = []
     for _ in range(size):
         users.append(repository.save(
-            username=email,
-            email=email
+            username=get_unique_email(),
+            email=get_unique_email()
         ))
 
     return users
@@ -37,7 +35,7 @@ def make_auth_sessions(size=5) -> List[AuthSessionEntity]:
 
     auth_sessions = []
     for _ in range(size):
-        dto = usecase.generate_auth_session_data(email, timestamp)
+        dto = usecase.generate_auth_session_data(get_unique_email(), timestamp)
         auth_sessions.append(repository.save(
             **dto.dict()
         ))
