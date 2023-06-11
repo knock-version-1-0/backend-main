@@ -9,6 +9,13 @@ class NoteDoesNotExistError(Exception):
         super().__init__(self.message, *args)
 
 
+class KeywordDoesNotExistError(Exception):
+    message = "Keyword가 존재하지 않습니다."
+    error_type = ObjectDoesNotExist
+    def __init__(self, *args):
+        super().__init__(self.message, *args)
+
+
 class NoteNameIntegrityError(Exception):
     message = "Note.name shouldn't be duplicated when User update or create as same author"
     error_type = IntegrityError

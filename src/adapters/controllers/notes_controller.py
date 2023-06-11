@@ -50,6 +50,11 @@ class KeywordController(BaseController):
     def __init__(self, service: KeywordService):
         self.service = service
     
+    def update(self, request: WsRequest, key: int) -> WsResponse:
+        payload, status = self.service.update(key=key, data=request.data, user_id=request.user.pk)
+        
+        return WsResponse(asdict(payload), status=status)
+    
     def create(self, request: WsRequest) -> WsResponse:
         payload, status = self.service.create(data=request.data, user_id=request.user.pk)
 

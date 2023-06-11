@@ -70,3 +70,11 @@ class KeywordUsecase(BaseUsecase):
         entity = self.repository.save(**dto.dict())
 
         return entity.literal()
+    
+
+    @authorize_required
+    def update(self, key: int, dto: KeywordDto, **variables) -> LiteralData:
+        self.repository.find_by_id(id=key)
+        entity = self.repository.save(**dto.dict())
+
+        return entity.literal()

@@ -20,6 +20,7 @@ from apps.notes.exceptions import (
     NoteDoesNotExistError,
     NoteNameIntegrityError,
     NoteNameLengthLimitError,
+    KeywordDoesNotExistError
 )
 from apps.users.exceptions import (
     UserInvalidError,
@@ -214,6 +215,38 @@ class KeywordService(BaseService):
     def __init__(self, usecase: KeywordUsecase):
         self.usecase = usecase
     
+    def update(self, key: int, data: dict, user_id: int):
+        status_code = None
+        parse = lambda o: KeywordDto(**data)
+
+        try:
+            status_code = status.HTTP_200_OK
+            obj = self.usecase.update(key=key, dto=parse(data), user_id=user_id)
+        
+        except UserInvalidError as e:
+            status_code = status.HTTP_401_UNAUTHORIZED
+            return error_wrapper(e, status_code)
+        
+        except UserPermissionError as e:
+            status_code = status.HTTP_403_FORBIDDEN
+            return error_wrapper(e, status_code)
+        
+        except NoteDoesNotExistError as e:
+            logger.error(e)
+            status_code = status.HTTP_404_NOT_FOUND
+            return error_wrapper(e, status_code)
+        
+        except KeywordDoesNotExistError as e:
+            status_code = status.HTTP_404_NOT_FOUND
+            return error_wrapper(e, status_code)
+        
+        except Exception as e:
+            logger.debug(e)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return error_wrapper(e, status_code)
+        
+        return (ApiPayload(status='OK', data=obj), status_code)
+    
     def create(self, data: dict, user_id: int, **variables):
         status_code = None
         parse = lambda o: KeywordDto(**data)
@@ -236,7 +269,7 @@ class KeywordService(BaseService):
             return error_wrapper(e, status_code)
 
         except Exception as e:
-            logger.error(e)
+            logger.debug(e)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             return error_wrapper(e, status_code)
 

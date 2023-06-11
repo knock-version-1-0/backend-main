@@ -1,6 +1,7 @@
+import jwt
+
 from django.db.utils import DatabaseError as _DatabaseError
 from django.core.exceptions import ValidationError as _ValidationError
-import jwt
 
 
 class DatabaseError(_DatabaseError):

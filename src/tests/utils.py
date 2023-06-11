@@ -12,7 +12,11 @@ def ws_response(consumer, data, token=None, key=None):
 
     try:
         consumer.initial(request)
-        response = consumer.create(request)
+        for method_name in consumer.get_crud_method_names():
+            handler = getattr(consumer, method_name, None)
+            if handler:
+                break
+        response = handler(request)
     except Exception as exc:
         response = consumer.handle_exception(exc)
 

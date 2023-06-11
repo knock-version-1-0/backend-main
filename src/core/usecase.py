@@ -18,7 +18,7 @@ class BaseUsecase:
     def create(self, dto: object, **variables) -> LiteralData:
         raise NotImplementedError()
     
-    def update(self, key: object, data: object, **variables) -> LiteralData:
+    def update(self, key: object, dto: object, **variables) -> LiteralData:
         raise NotImplementedError()
     
     def delete(self, key: object, **variables) -> None:

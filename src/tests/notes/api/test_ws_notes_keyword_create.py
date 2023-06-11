@@ -16,7 +16,7 @@ from core.utils.data import ApiPayload, ErrorDetail
 
 
 @pytest.mark.django_db
-def test_200_OK():
+def test_OK():
     user = make_users(size=1)[0]
     note = make_notes(author_id=user.id, size=1)[0]
     dto = make_keyword_dto(note_id=note.id)
@@ -42,7 +42,7 @@ def test_200_OK():
 
 
 @pytest.mark.django_db
-def test_401_UserInvalidError():
+def test_UserInvalidError():
     user = make_users(size=1)[0]
     note = make_notes(author_id=user.id, size=1)[0]
     dto = make_keyword_dto(note_id=note.id)
@@ -58,7 +58,7 @@ def test_401_UserInvalidError():
 
 
 @pytest.mark.django_db
-def test_403_UserPermissionError():
+def test_UserPermissionError():
     users = make_users(size=2)
     note = make_notes(author_id=users[0].id, size=1)[0]
     dto = make_keyword_dto(note_id=note.id)
@@ -74,7 +74,7 @@ def test_403_UserPermissionError():
 
 
 @pytest.mark.django_db
-def test_404_NoteDoesNotExistError():
+def test_NoteDoesNotExistError():
     user = make_users(size=1)[0]
     note = make_notes(author_id=user.id, size=1)[0]
     dto = make_keyword_dto(note_id=note.id + 1)
