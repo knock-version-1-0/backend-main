@@ -1,30 +1,26 @@
-from django.core.exceptions import ObjectDoesNotExist, BadRequest
-from django.db.utils import IntegrityError
+from rest_framework import exceptions, status
+from django.utils.translation import gettext_lazy as _
 
 
-class NoteDoesNotExistError(Exception):
-    message = "Note should be existed when User retrieve"
-    error_type = ObjectDoesNotExist
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class NoteDoesNotExistError(exceptions.APIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = _("Note should be existed when User retrieve")
+    default_code = _('NoteDoesNotExistError')
 
 
-class KeywordDoesNotExistError(Exception):
-    message = "Keyword가 존재하지 않습니다."
-    error_type = ObjectDoesNotExist
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class KeywordDoesNotExistError(exceptions.APIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = _("Keyword가 존재하지 않습니다.")
+    default_code = _('KeywordDoesNotExistError')
 
 
-class NoteNameIntegrityError(Exception):
-    message = "Note.name shouldn't be duplicated when User update or create as same author"
-    error_type = IntegrityError
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class NoteNameIntegrityError(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Note.name shouldn't be duplicated when User update or create as same author")
+    default_code = _('NoteNameIntegrityError')
 
 
-class NoteNameLengthLimitError(Exception):
-    message = "Note list max length is {limit}"
-    error_type = BadRequest
-    def __init__(self, limit, *args):
-        super().__init__(f"Note list max length is {limit}", *args)
+class NoteNameLengthLimitError(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Note list max length is 25")
+    default_code = _('NoteNameLengthLimitError')

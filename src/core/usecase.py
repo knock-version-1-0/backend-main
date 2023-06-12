@@ -9,7 +9,7 @@ class BaseUsecase:
     def __init__(self, repository: BaseRepository, context: Optional[dict]=None):
         self.repository = repository
 
-    def list(self, params: Optional[QueryDict]=None, user_id: Optional[int]=None) -> List[LiteralData]:
+    def list(self, params: Optional[QueryDict]=None, **variables) -> List[LiteralData]:
         raise NotImplementedError()
     
     def retrieve(self, key: object, **variables) -> LiteralData:

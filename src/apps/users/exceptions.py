@@ -1,89 +1,74 @@
-from rest_framework.exceptions import PermissionDenied
-from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist
+from rest_framework import exceptions, status
+from django.utils.translation import gettext_lazy as _
 
 
-class UserInvalidError(Exception):
-    message = "User invalid"
-    error_type = Exception
-    def __init__(self, *args):
-        """
-        유효하지 않은 유저에 대한 요청입니다.
-        """
-        super().__init__(self.message, *args)
+class UserInvalidError(exceptions.APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = _("User invalid")
+    default_code = _('UserInvalidError')
 
 
-class UserPermissionError(Exception):
-    message = "유저 접근 권한이 없습니다."
-    error_type = PermissionDenied
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class UserPermissionError(exceptions.APIException):
+    status_code = status.HTTP_403_FORBIDDEN
+    default_detail = _("유저 접근 권한이 없습니다.")
+    default_code = _('UserPermissionError')
 
 
-class InvalidTokenType(Exception):
-    message = "Token type should be 'refresh' or 'access'"
-    error_type = BadRequest
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class InvalidTokenType(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Token type should be 'refresh' or 'access'")
+    default_code = _('InvalidTokenType')
 
 
-class AuthTokenCannotRead(Exception):
-    message = "User는 isActive 상태일 때, token을 생성할 수 있습니다."
-    error_type = BadRequest
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class AuthTokenCannotRead(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("User는 isActive 상태일 때, token을 생성할 수 있습니다.")
+    default_code = _('AuthTokenCannotRead')
 
 
-class EmailAddrValidationError(Exception):
-    message = "Email is invalid. Please check your email"
-    error_type = ValidationError
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class EmailAddrValidationError(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Email is invalid. Please check your email")
+    default_code = _('EmailAddrValidationError')
 
 
-class AttemptLimitOver(Exception):
-    message = "attempt는 최대 3회까지 가능합니다."
-    error_type = BadRequest
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class AttemptLimitOver(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("attempt는 최대 3회까지 가능합니다.")
+    default_code = _('AttemptLimitOver')
 
 
-class EmailSendFailed(Exception):
-    message = "Email을 보내지 못했습니다. Server의 system connection을 점검해주세요."
-    error_type = Exception
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class EmailSendFailed(exceptions.APIException):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = _("Email을 보내지 못했습니다. Server의 system connection을 점검해주세요.")
+    default_code = _('EmailSendFailed')
 
 
-class AuthenticationFailed(Exception):
-    message = "Failed authentication"
-    error_type = Exception
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class AuthenticationFailed(exceptions.APIException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    default_detail = _("Failed authentication")
+    default_code = _('AuthenticationFailed')
 
 
-class AuthSessionExpired(Exception):
-    message = "Auth session is expired"
-    error_type = BadRequest
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class AuthSessionExpired(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Auth session is expired")
+    default_code = _('AuthSessionExpired')
 
 
-class AuthSessionDoesNotExist(Exception):
-    message = "해당 session이 존재하지 않거나 올바르지 않은 email입니다."
-    error_type = ObjectDoesNotExist
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class AuthSessionDoesNotExist(exceptions.APIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = _("해당 session이 존재하지 않거나 올바르지 않은 email입니다.")
+    default_code = _('AuthSessionDoesNotExist')
 
 
-class RefreshTokenExpired(Exception):
-    message = "refresh token is expired please authenticate user."
-    error_type = BadRequest
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class RefreshTokenExpired(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("refresh token is expired please authenticate user.")
+    default_code = _('RefreshTokenExpired')
 
 
-class RefreshTokenRequired(Exception):
-    message = "Refresh token is required in request body"
-    error_type = BadRequest
-    def __init__(self, *args):
-        super().__init__(self.message, *args)
+class RefreshTokenRequired(exceptions.APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _("Refresh token is required in request body")
+    default_code = _('RefreshTokenRequired')

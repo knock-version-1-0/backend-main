@@ -8,10 +8,6 @@ class ErrorDetail:
     message: Optional[str]=None
 
 
-def make_error_detail(type: str, detail: Optional[str]=None) -> ErrorDetail:
-    return ErrorDetail(type=type, message=detail)
-
-
 Data = TypeVar('Data')
 
 

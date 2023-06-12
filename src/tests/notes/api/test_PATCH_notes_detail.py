@@ -90,7 +90,7 @@ def test_400_NoteNameLengthLimitError(auth_client_fixture):
     url = reverse('notes-detail', args=[note.displayId])
     response = client.patch(url, data=req_dto.query_dict(), format='json')
     assert response.status_code == 400
-    assert response.data['type'] == get_error_name(NoteNameLengthLimitError(NOTE_NAME_LENGTH_LIMIT))
+    assert response.data['type'] == get_error_name(NoteNameLengthLimitError())
 
 
 @pytest.mark.django_db

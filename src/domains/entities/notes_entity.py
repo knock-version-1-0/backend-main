@@ -42,7 +42,7 @@ class NoteEntity(BaseEntity):
     @validator('name', pre=True)
     def check_name_length_limit(cls, v):
         if len(v) > NOTE_NAME_LENGTH_LIMIT:
-            raise NoteNameLengthLimitError(NOTE_NAME_LENGTH_LIMIT)
+            raise NoteNameLengthLimitError()
         return v
 
 

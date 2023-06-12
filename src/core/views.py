@@ -19,6 +19,6 @@ def exception_handler(exc, context):
         response.data.pop('detail')
 
         response.data['type'] = exc.default_code
-        response.data['message'] = exc.default_detail
+        response.data['message'] = str(exc)
     
     return response

@@ -5,7 +5,6 @@ from rest_framework import viewsets
 
 class AuthEmailViewSet(viewsets.ViewSet):
     controller = None
-    authentication_classes = []
 
     def create(self, request: Request) -> Response:
         return self.controller.send_email(
@@ -15,7 +14,6 @@ class AuthEmailViewSet(viewsets.ViewSet):
 
 class AuthVerificationViewSet(viewsets.ViewSet):
     controller = None
-    authentication_classes = []
 
     def create(self, request: Request) -> Response:
         return self.controller.verify(
@@ -25,7 +23,6 @@ class AuthVerificationViewSet(viewsets.ViewSet):
 
 class AuthTokenViewSet(viewsets.ViewSet):
     controller = None
-    authentication_classes = []
 
     def create(self, request: Request) -> Response:
         return self.controller.create(
@@ -35,7 +32,6 @@ class AuthTokenViewSet(viewsets.ViewSet):
 
 class UserListViewSet(viewsets.ViewSet):
     controller = None
-    authentication_classes = []
 
     def create(self, request: Request) -> Response:
         return self.controller.create(

@@ -29,8 +29,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         The `authenticate` method is called on every request, regardless of
         whether the endpoint requires authentication. 
         `authenticate` has two possible return values:
-        1) `None` - We return `None` if we do not wish to authenticate. Usually
-        this means we know authentication will fail. An example of
+        1) `(None, None)` - We return `(None, None)` if we do not wish to authenticate. Usually
+        this means we don't need some authentication. An example of
         this is when the request does not include a token in the
         headers.
         2) `(user, token)` - We return a user/token combination when 
@@ -49,7 +49,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         auth_header_prefix = self.authentication_header_prefix.lower()
 
         if not auth_header:
-            return None
+            return (None, None)
 
         if len(auth_header) == 1:
             # Invalid token header. No credentials provided. Do not attempt to
