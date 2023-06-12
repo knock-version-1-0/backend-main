@@ -1,14 +1,13 @@
 import logging
 
 from rest_framework import exceptions, status
-from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
 
 class DatabaseError(exceptions.APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_code = _('DatabaseError')
+    default_code = 'DatabaseError'
 
     def __init__(self, detail=None, code=None):
         super().__init__(detail, code)
@@ -17,7 +16,7 @@ class DatabaseError(exceptions.APIException):
 
 class InternalServerError(exceptions.APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_code = _('InternalServerError')
+    default_code = 'InternalServerError'
 
     def __init__(self, detail=None, code=None):
         super().__init__(detail, code)
@@ -25,7 +24,7 @@ class InternalServerError(exceptions.APIException):
 
 
 class ValidationError(exceptions.ValidationError):
-    default_code = _('ValidationError')
+    default_code = 'ValidationError'
 
     def __init__(self, detail=None, code=None):
         super().__init__(detail, code)
@@ -34,5 +33,5 @@ class ValidationError(exceptions.ValidationError):
 
 class ExpiredSignatureError(exceptions.APIException):
     status_code = status.HTTP_400_BAD_REQUEST
-    default_code = _('ExpiredSignatureError')
-    default_detail = _("Token is expired")
+    default_code = 'ExpiredSignatureError'
+    default_detail = "Token is expired"
