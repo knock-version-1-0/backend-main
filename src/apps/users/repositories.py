@@ -214,3 +214,13 @@ class UserRepository(UserRepositoryInterface):
 
         except Exception as e:
             raise DatabaseError(e)
+    
+    def me(self):
+        user: User = self.user
+        return self.UserEntity(
+            id=user.pk,
+            username=user.username,
+            email=user.email,
+            isActive=user.is_active,
+            isStaff=user.is_staff
+        )

@@ -68,3 +68,8 @@ class UserController(BaseController):
         payload, status = self.service.create(request.data)
 
         return Response(asdict(payload), status=status)
+    
+    def me(self, request: HttpRequest) -> Response:
+        payload, status = self.service.me(user_id=request.user.pk)
+
+        return Response(asdict(payload), status=status)

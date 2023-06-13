@@ -37,3 +37,12 @@ class UserListViewSet(viewsets.ViewSet):
         return self.controller.create(
             request=request
         )
+    
+
+class UserMeListViewSet(viewsets.ViewSet):
+    controller = None
+
+    def list(self, request: Request) -> Response:
+        return self.controller.me(
+            request=request
+        )

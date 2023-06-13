@@ -28,6 +28,7 @@ from apps.users.exceptions import (
     RefreshTokenRequired
 )
 from core.exceptions import ExpiredSignatureError
+from core.utils.decorators import authorize_required
 
 
 def _get_random_email_code():
@@ -147,3 +148,9 @@ class UserUsecase(BaseUsecase):
             'accessToken': entity.accessToken.value
         }
         return dto
+    
+    @authorize_required
+    def me(self, **variables) -> LiteralData:
+        entity = self.repository.me()
+
+        return entity.literal()

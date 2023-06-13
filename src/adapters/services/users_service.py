@@ -11,6 +11,7 @@ from adapters.dto.users_dto import (
 )
 from domains.usecases.users_usecase import (
     AuthSessionUsecase,
+    UserUsecase
 )
 
 
@@ -39,3 +40,11 @@ class AuthTokenService(BaseService):
 
 class UserService(BaseService):
     dto_class = UserDto
+
+    def __init__(self, usecase: UserUsecase):
+        self.usecase = usecase
+
+    def me(self, success='OK', **variables):
+        obj = self.usecase.me(**variables)
+
+        return (ApiPayload(status=success, data=obj), success_code[success])
