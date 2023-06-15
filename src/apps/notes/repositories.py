@@ -57,11 +57,8 @@ class NoteRepository(NoteRepositoryInterface):
         try:
             note = self.queryset.get(display_id=key)
 
-        except Note.DoesNotExist:
+        except Exception:
             raise NoteDoesNotExistError()
-
-        except Exception as e:
-            raise DatabaseError(e)
 
         self.set_model_instance(note)
         self.check_permission(note.shared_only)

@@ -34,8 +34,9 @@ def test_200_OK(auth_client_fixture):
 def test_404_NoteDoesNotExistError(auth_client_fixture):
     client, user, set_credential = auth_client_fixture
 
-    url = reverse('notes-detail', args=[uuid.uuid4()])
+    url = reverse('notes-detail', args=[str(uuid.uuid4())+'d'])
     response = client.get(url)
+    print(response.data)
     assert response.status_code == 404
     assert response.data['type'] == get_error_name(NoteDoesNotExistError())
 
