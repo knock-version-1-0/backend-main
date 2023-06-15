@@ -57,7 +57,7 @@ class Keyword(models.Model):
     parent = models.ForeignKey('Keyword', on_delete=models.CASCADE, null=True)
     pos_x = models.IntegerField()
     pos_y = models.IntegerField()
-    text = models.CharField(max_length=12, null=True, blank=True)
+    text = models.CharField(max_length=50, null=True, blank=True)
     status = models.IntegerField(choices=KeywordStatusChoice.choices)
     timestamp = models.CharField(max_length=13)
 
