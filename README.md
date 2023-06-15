@@ -3,6 +3,8 @@
 ## Skills
 
 ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![django-channels](https://img.shields.io/badge/-django--channels-blue)
+![Clean architecture](https://img.shields.io/badge/-clean--architecture-orange)
 
 ## ERD
 
@@ -18,24 +20,6 @@
     <img width="100%" alt="swagger" src="https://user-images.githubusercontent.com/82345753/230279427-95f81f89-b5bd-4897-998f-4bc64e3cad7d.png">
 </a>
 
-## Description
+## Project description
 
-Knock main backend is concentrated on how to manage note application.
-
-Note domain is very conceptual and iconic application in knock project. To protect the concistency and make great sensitivity of domain, I should choice the architecture that could test efficiently.
-
-Thanks to https://github.com/sdediego/django-clean-architecture, I can make a draft of the clean architecture based on django rest framework. Additionally, I drive intuitive solutions like below.
-
-1. DI
-
-    Using factory that can access the objects with property(getter) which provide simple testable object.
-
-2. DIP
-
-    To make independency of accessing database in usecase, usecase refers repository interface, not a repository instance. To implement usecase, we should use repository interface that is not implemented. Dependency injection factory can do inject the dependency of repository on usecase.
-
-3. Exception based logic
-
-    To process status of requirement, I use the domain exception. The domain exception name is the same as the Schema in the API Documentation.
-
-<img width="602" alt="image" src="https://user-images.githubusercontent.com/82345753/231249169-5972e874-8f4c-45aa-b89b-da6bb1c498cd.png">
+[https://tangible-velvet-8ec.notion.site/86e56bc3eca64e098925de8b2e6736ee?pvs=4](https://tangible-velvet-8ec.notion.site/86e56bc3eca64e098925de8b2e6736ee?pvs=4)
