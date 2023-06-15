@@ -21,6 +21,13 @@
     <img width="100%" alt="swagger" src="https://user-images.githubusercontent.com/82345753/230279427-95f81f89-b5bd-4897-998f-4bc64e3cad7d.png">
 </a>
 
+## Figma
+
+[https://www.figma.com/file/MhShAIR9PU5TMyKFEDGbtN/Knock-Figma?type=design&node-id=0%3A1&t=sdE1jPsdUBE39h9R-1](https://www.figma.com/file/MhShAIR9PU5TMyKFEDGbtN/Knock-Figma?type=design&node-id=0%3A1&t=sdE1jPsdUBE39h9R-1)
+<a href="https://www.figma.com/file/MhShAIR9PU5TMyKFEDGbtN/Knock-Figma?type=design&node-id=0%3A1&t=sdE1jPsdUBE39h9R-1">
+    <img width="1428" alt="스크린샷 2023-06-16 오전 1 12 03" src="https://github.com/knock-version-1-0/backend-main/assets/82345753/95d04681-044f-4465-a1cf-43e4c6c95d43">
+</a>
+
 ## Project description
 
 [https://tangible-velvet-8ec.notion.site/86e56bc3eca64e098925de8b2e6736ee?pvs=4](https://tangible-velvet-8ec.notion.site/86e56bc3eca64e098925de8b2e6736ee?pvs=4)
