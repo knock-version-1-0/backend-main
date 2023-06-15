@@ -36,19 +36,17 @@ class BaseConsumer(AsyncWebsocketConsumer):
         )
     
     async def handle_message(self, event):
-        for method_name in self.get_crud_method_names():
-            handler = getattr(self, method_name, None)
-            if handler:
-                request = self.get_request(event)
-                try:
-                    self.initial(request)
-                    response = handler(request)
-                except Exception as exc:
-                    response = self.handle_exception(exc)
+        request = self.get_request(event)
+        handler = self.get_handler()
+        if handler:
+            try:
+                self.initial(request)
+                response = handler(request)
+            except Exception as exc:
+                response = self.handle_exception(exc)
 
-                await self.send(text_data=json.dumps(response.data))
-                return
-        raise Exception('CRUD method is not implemented.')
+            await self.send(text_data=json.dumps(response.data))
+            return
 
 
 class Consumer(BaseConsumer):
@@ -64,6 +62,7 @@ class Consumer(BaseConsumer):
         data = json.loads(_json['data'])
         authorization: str = _json.get('authorization')
         key = _json.get('key')
+        self.method_name = _json['method']
 
         request = Request(
             data=data,
@@ -129,6 +128,13 @@ class Consumer(BaseConsumer):
 
         response.exception = True
         return response
+    
+    def get_handler(self):
+        if self.method_name not in self.get_crud_method_names():
+            raise Exception('CRUD method is not implemented.')
+        handler = getattr(self, self.method_name, None)
+
+        return handler
 
     @property
     def controller(self) -> BaseController:

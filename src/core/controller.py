@@ -16,3 +16,6 @@ class BaseController:
 
     def update(self, request, key):
         raise NotImplementedError()
+    
+    def delete(self, request, key):
+        raise NotImplementedError()

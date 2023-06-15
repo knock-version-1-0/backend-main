@@ -6,9 +6,14 @@ from core.ws.response import Response
 APP_NAME = "notes"
 
 
-class NoteUpdateKeywordConsumer(Consumer):
+class NoteKeywordConsumer(Consumer):
     app_name = APP_NAME
     key_name = "note_id"
+
+    def create(self, request: Request) -> Response:
+        return self.controller.create(
+            request=request
+        )
     
     def update(self, request: Request):
         return self.controller.update(
@@ -16,12 +21,8 @@ class NoteUpdateKeywordConsumer(Consumer):
             key=request.key
         )
 
-
-class NoteCreateKeywordConsumer(Consumer):
-    app_name = APP_NAME
-    key_name = "note_id"
-
-    def create(self, request: Request) -> Response:
-        return self.controller.create(
-            request=request
+    def delete(self, request: Request) -> Response:
+        return self.controller.delete(
+            request=request,
+            key=request.key
         )

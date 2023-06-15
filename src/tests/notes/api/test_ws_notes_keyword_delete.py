@@ -6,7 +6,6 @@ from tests.factories.users import make_users
 from tests.utils import ws_response
 from core.utils.exceptions import get_error_name
 from apps.notes.exceptions import (
-    NoteDoesNotExistError,
     KeywordDoesNotExistError
 )
 from apps.users.exceptions import (
@@ -17,8 +16,9 @@ from apps.notes.consumers import NoteKeywordConsumer
 from core.utils.data import ApiPayload, ErrorDetail
 
 
+
 @pytest.mark.django_db
-def test_UPDATE():
+def test_DELETE():
     user = make_users(size=1)[0]
     note = make_notes(author_id=user.id, size=1)[0]
     dto = make_keyword_dto(note_id=note.id)
@@ -27,23 +27,16 @@ def test_UPDATE():
     repository.authorize(user.id)
     keyword_entity = repository.save(**dto.dict())
 
-    update_content = {
-        'text': 'some keyword'
-    }
-    dto = dto.copy(update=update_content)
-
     response = ws_response(
         consumer=NoteKeywordConsumer(KeywordFactory()),
-        method='update',
-        data=dto.query_dict(),
+        method='delete',
+        data=None,
         token=user.accessToken.value,
         key=keyword_entity.id
     )
     payload = ApiPayload(**response.data)
 
-    keyword_entity = keyword_entity.copy(update=update_content)
-    assert payload.data == keyword_entity.dict()
-    assert payload.status == 'UPDATE'
+    assert payload.status == 'DELETE'
 
 
 @pytest.mark.django_db
@@ -56,15 +49,10 @@ def test_UserInvalidError():
     repository.authorize(user.id)
     keyword_entity = repository.save(**dto.dict())
 
-    update_content = {
-        'text': 'some keyword'
-    }
-    dto = dto.copy(update=update_content)
-
     response = ws_response(
         consumer=NoteKeywordConsumer(KeywordFactory()),
-        method='update',
-        data=dto.query_dict(),
+        method='delete',
+        data=None,
         token=user.accessToken.value + '_',
         key=keyword_entity.id
     )
@@ -84,15 +72,10 @@ def test_UserPermissionError():
     repository.authorize(users[0].id)
     keyword_entity = repository.save(**dto.dict())
 
-    update_content = {
-        'text': 'some keyword'
-    }
-    dto = dto.copy(update=update_content)
-
     response = ws_response(
         consumer=NoteKeywordConsumer(KeywordFactory()),
-        method='update',
-        data=dto.query_dict(),
+        method='delete',
+        data=None,
         token=users[1].accessToken.value,
         key=keyword_entity.id
     )
@@ -100,36 +83,6 @@ def test_UserPermissionError():
     error_detail = ErrorDetail(**response.data)
 
     assert error_detail.type == get_error_name(UserPermissionError())
-
-
-@pytest.mark.django_db
-def test_NoteDoesNotExistError():
-    user = make_users(size=1)[0]
-    note = make_notes(author_id=user.id, size=1)[0]
-    dto = make_keyword_dto(note_id=note.id)
-
-    repository = KeywordFactory().repository
-    repository.authorize(user.id)
-    keyword_entity = repository.save(**dto.dict())
-
-    dto = make_keyword_dto(note_id=note.id + 1)
-
-    update_content = {
-        'text': 'some keyword'
-    }
-    dto = dto.copy(update=update_content)
-
-    response = ws_response(
-        consumer=NoteKeywordConsumer(KeywordFactory()),
-        method='update',
-        data=dto.query_dict(),
-        token=user.accessToken.value,
-        key=keyword_entity.id
-    )
-
-    error_detail = ErrorDetail(**response.data)
-
-    assert error_detail.type == get_error_name(NoteDoesNotExistError())
 
 
 @pytest.mark.django_db
@@ -142,15 +95,10 @@ def test_KeywordDoesNotExistError():
     repository.authorize(user.id)
     keyword_entity = repository.save(**dto.dict())
 
-    update_content = {
-        'text': 'some keyword'
-    }
-    dto = dto.copy(update=update_content)
-
     response = ws_response(
         consumer=NoteKeywordConsumer(KeywordFactory()),
-        method='update',
-        data=dto.query_dict(),
+        method='delete',
+        data=None,
         token=user.accessToken.value,
         key=keyword_entity.id + 1
     )

@@ -39,6 +39,11 @@ class Note(TimestampedModel):
         if user.pk != self.author.pk:
             return False
         return True
+    
+    def editable_only(self, user):
+        if user.pk != self.author.pk:
+            return False
+        return True
 
 
 class KeywordStatusChoice(models.IntegerChoices):

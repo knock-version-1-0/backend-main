@@ -163,7 +163,7 @@ class KeywordRepository(KeywordRepositoryInterface):
             except Note.DoesNotExist:
                 raise NoteDoesNotExistError()
 
-            self.check_permission(note.shared_only)
+            self.check_permission(note.editable_only)
 
             parent_id = kwargs.pop('parent_id')
             parent = None if not parent_id else Keyword.objects.get(pk=parent_id)
@@ -197,3 +197,15 @@ class KeywordRepository(KeywordRepositoryInterface):
             status=keyword.status,
             timestamp=keyword.timestamp
         )
+    
+    def delete(self):
+        keyword: Keyword = self.get_model_instance()
+        note: Note = keyword.note
+        self.check_permission(note.editable_only)
+
+        try:
+            keyword.delete()
+            self.set_model_instance(None)
+
+        except Exception as e:
+            raise DatabaseError(e)

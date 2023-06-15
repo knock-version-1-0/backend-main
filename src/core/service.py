@@ -12,6 +12,9 @@ from core.exceptions import InternalServerError
 
 success_code = {
     'OK': status.HTTP_200_OK,
+    'CREATE': status.HTTP_200_OK,
+    'UPDATE': status.HTTP_200_OK,
+    'DELETE': status.HTTP_200_OK,
     'CREATED': status.HTTP_201_CREATED,
     'NO_CONTENT': status.HTTP_204_NO_CONTENT
 }

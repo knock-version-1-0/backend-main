@@ -59,3 +59,8 @@ class KeywordController(BaseController):
         payload, status = self.service.create(data=request.data, user_id=request.user.pk)
 
         return WsResponse(asdict(payload), status=status)
+    
+    def delete(self, request: WsRequest, key: int) -> WsResponse:
+        payload, status = self.service.delete(key=key, user_id=request.user.pk)
+
+        return WsResponse(asdict(payload), status=status)

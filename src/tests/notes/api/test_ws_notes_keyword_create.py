@@ -11,18 +11,19 @@ from apps.users.exceptions import (
     UserInvalidError,
     UserPermissionError
 )
-from apps.notes.consumers import NoteCreateKeywordConsumer
+from apps.notes.consumers import NoteKeywordConsumer
 from core.utils.data import ApiPayload, ErrorDetail
 
 
 @pytest.mark.django_db
-def test_OK():
+def test_CREATE():
     user = make_users(size=1)[0]
     note = make_notes(author_id=user.id, size=1)[0]
     dto = make_keyword_dto(note_id=note.id)
 
     response = ws_response(
-        consumer=NoteCreateKeywordConsumer(KeywordFactory()),
+        consumer=NoteKeywordConsumer(KeywordFactory()),
+        method='create',
         data=dto.query_dict(),
         token=user.accessToken.value
     )
@@ -38,7 +39,7 @@ def test_OK():
         status=dto.status,
         timestamp=dto.timestamp
     ).dict()
-    assert payload.status == 'OK'
+    assert payload.status == 'CREATE'
 
 
 @pytest.mark.django_db
@@ -48,7 +49,8 @@ def test_UserInvalidError():
     dto = make_keyword_dto(note_id=note.id)
 
     response = ws_response(
-        consumer=NoteCreateKeywordConsumer(KeywordFactory()),
+        consumer=NoteKeywordConsumer(KeywordFactory()),
+        method='create',
         data=dto.query_dict(),
         token=user.accessToken.value + '_'
     )
@@ -64,7 +66,8 @@ def test_UserPermissionError():
     dto = make_keyword_dto(note_id=note.id)
 
     response = ws_response(
-        consumer=NoteCreateKeywordConsumer(KeywordFactory()),
+        consumer=NoteKeywordConsumer(KeywordFactory()),
+        method='create',
         data=dto.query_dict(),
         token=users[1].accessToken.value
     )
@@ -80,7 +83,8 @@ def test_NoteDoesNotExistError():
     dto = make_keyword_dto(note_id=note.id + 1)
 
     response = ws_response(
-        consumer=NoteCreateKeywordConsumer(KeywordFactory()),
+        consumer=NoteKeywordConsumer(KeywordFactory()),
+        method='create',
         data=dto.query_dict(),
         token=user.accessToken.value
     )

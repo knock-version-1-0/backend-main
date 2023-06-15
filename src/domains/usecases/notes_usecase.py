@@ -78,3 +78,10 @@ class KeywordUsecase(BaseUsecase):
         entity = self.repository.save(**dto.dict())
 
         return entity.literal()
+    
+    @authorize_required
+    def delete(self, key: object, **variables) -> LiteralData:
+        entity = self.repository.find_by_id(id=key)
+        self.repository.delete()
+
+        return entity.literal()
