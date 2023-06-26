@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  api_main:
+    image: api/main
+    container_name: api_main
+    env_file:
+      - ./src/.env
+    build: ./src
+    volumes:
+      - ./scripts/entrypoint.sh:/app/entrypoint.sh
+      - ./scripts/wait-for-it.sh:/app/wait-for-it.sh
+    command: |
+      sh -c "./wait-for-it.sh db:5432 --
+            ./entrypoint.sh"
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - db
+      - redis
+      - cache_default
+
+  db:
+    image: postgres:14.2
+    container_name: postgres
+    env_file:
+      - ./src/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts/db-init.sh:/scripts/db-init.sh
+      - ./db/sql:/sql
+  
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+  
+  cache_default:
+    image: memcached:latest
+    container_name: cache_default
+    ports:
+      - 11211:11211
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./src/.static-files:/src/static-files
+    depends_on:
+      - api_main

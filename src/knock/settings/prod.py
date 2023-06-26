@@ -4,5 +4,5 @@ DEBUG = False
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
+    os.environ.get('WEB_DOMAIN_ADDRESS'),
 ]
