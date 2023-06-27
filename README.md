@@ -33,3 +33,14 @@
 <a href="https://www.figma.com/file/MhShAIR9PU5TMyKFEDGbtN/Knock-Figma?type=design&node-id=0%3A1&t=sdE1jPsdUBE39h9R-1">
     <img width="1428" alt="스크린샷 2023-06-16 오전 1 12 03" src="https://github.com/knock-version-1-0/backend-main/assets/82345753/95d04681-044f-4465-a1cf-43e4c6c95d43">
 </a>
+
+## Deploy
+
+1. Set .env file in ./src/
+2. Set logs/app.log in ./src/knock/
+3. [Command] make up-prod
+
+## Clean
+
+1. [Command] make clean
+2. [Command] docker volume rm $(docker volume ls -q)
