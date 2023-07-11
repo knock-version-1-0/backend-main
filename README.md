@@ -38,9 +38,18 @@
 
 1. Set .env file in ./src/
 2. Set logs/app.log in ./src/knock/
-3. [Command] make up-prod
+3. Typing at terminal
+
+```console
+make up-prod
+```
 
 ## Clean
 
-1. [Command] make clean
-2. [Command] docker volume rm $(docker volume ls -q)
+```console
+make clean
+```
+
+```console
+docker volume rm $(docker volume ls -q)
+```
