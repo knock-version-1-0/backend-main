@@ -27,5 +27,5 @@ restart:
 	docker build -t api/main .
 	docker run -p 8000:8000 --name api_main --network backend-main_default api/main
 
-dev-environment:
+env:
 	docker-compose -f ../docker-compose.env.yaml up -d
